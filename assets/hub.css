@@ -85,3 +85,6 @@ h1{font-size:25px;line-height:1.2;margin:0;font-weight:650;letter-spacing:-.01em
 @media(max-width:520px){.g2,.g5,.g6,.g4{grid-template-columns:1fr}.top .lbl{display:none}.brief4{grid-template-columns:1fr}}
 @media print{.noprint,.top,.side,.fbar,.foot,#toasts{display:none!important}body,.mainw{overflow:visible;height:auto;background:#fff}.paper{padding:0}}
 .sh,.phases,.strip,.brief4,.sf{flex:none}
+.opby{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--ink3);white-space:nowrap}.opby img{height:20px;background:#fff;border-radius:3px;padding:1px 3px}
+.sys .lg{height:18px;min-width:18px;max-width:58px;background:#fff;border-radius:4px;padding:1px 3px;display:inline-flex;align-items:center;flex:none}.sys .lg img{max-height:16px;max-width:52px;display:block}
+.lgrow{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}.lgrow img{height:24px;background:#fff;border-radius:4px;padding:3px 5px;border:1px solid var(--line)}
