@@ -116,5 +116,62 @@ rep_literal('dN = [', 'dN = ["Priya", "Rahul", "Anita", "Karthik", "Meera", "Arj
 rep_literal('const cV = [', 'const cV = ["Industrial Development Area", "GIDC Industrial Estate", "SIDCUL Industrial Area", "Shuaiba Industrial Area", "Al Hamra Industrial Zone", "Industrial City Phase 3", "HITEC City", "MIDC", "Ring Road", "Free Zone", "Binh Duong Industrial Park", "District 7"]')
 rep_literal('W2 = [', 'W2 = [{ id: "pt", label: "India and UAE", at: "06:30 local", tzs: ["PT", "AZ"] }, { id: "mt", label: "Kuwait and Saudi Arabia", at: "06:30 local", tzs: ["MT"] }, { id: "ct", label: "Egypt", at: "06:30 local", tzs: ["CT"] }, { id: "et", label: "Vietnam", at: "06:30 local", tzs: ["ET"] }]')
 
+
+# ---- stage 2: Kirby storyline wiring
+# hero runs on Jio, the primary circuit at Hyderabad City Office, with Palo Alto SD-WAN at the edge
+i = s.find('const $S = ['); j = s.find('function dee()', i)
+hero = s[i:j]
+hero = hero.replace('Zayo QoS Network Services portal', 'Jio enterprise portal').replace('Zayo', 'Jio').replace('ZAY-SEG-PHX-04', 'JIO-SEG-GUJ-01').replace('ZAY-', 'JIO-').replace('ZQ-', 'JQ-')
+hero = hero.replace('"VeloCloud Status", source: "VeloCloud"', '"Palo Alto SD-WAN", source: "VeloCloud"').replace('"VeloCloud Status", "VeloCloud"', '"Palo Alto SD-WAN", "VeloCloud"')
+s = s[:i] + hero + s[j:]
+# event sources renamed on screen still resolve to their tool icons
+rep_exact('NN = { LogicMonitor: "lm",', 'NN = { OpsRamp: "lm", Airtel: "zayo", Jio: "zayo", "Tata Tele": "zayo", KEMS: "zayo", STC: "zayo", NetWorker: "qnap", "Voice agent": "polyai", "Key Vault": "cyberark", "OpsRamp dashboards": "grafana", GlobalProtect: "prisma", "SAP ERP": "epic", "SAP GUI": "citrix", "Windows Hello": "imprivata", "Endpoint Analytics": "nanoheal", "Copilot Studio": "mova", LogicMonitor: "lm",')
+# S7 runs on 8 site VMs: 6 cleaned autonomously, 2 extended by change
+i = s.find('function mee()'); j = s.find('function Aee()', i)
+s = s[:i] + s[i:j].replace('e11.slice(0, 18)', 'e11.slice(0, 6)').replace('.sets.s7.slice(18)', '.sets.s7.slice(6)') + s[j:]
+# voice calls come from the right Kirby sites
+rep_exact('handoff: { name: "Hand-off to a person", icon: "UserCheck", clinicId: "0752"', 'handoff: { name: "Hand-off to a person", icon: "UserCheck", clinicId: "0301"')
+rep_exact('known: { name: "Known outage: no duplicate ticket", icon: "Radio", clinicId: "0314"', 'known: { name: "Known outage: no duplicate ticket", icon: "Radio", clinicId: "0826"')
+rep_exact('starter: { name: "New starter request", icon: "UserPlus", clinicId: "0117"', 'starter: { name: "New starter request", icon: "UserPlus", clinicId: "0248"')
+rep_exact('payments: { name: "Card terminal back online", icon: "CreditCard"', 'payments: { name: "Weighbridge PC back online", icon: "Truck"')
+# NOC shifts and field engineers
+rep_literal('Bw = {', 'Bw = { noc: [{ name: "Priya R.", shift: "06:00\\u201314:00 IST", on: true }, { name: "Arjun M.", shift: "06:00\\u201314:00 IST", on: true }, { name: "Sofia L.", shift: "06:00\\u201314:00 IST", on: true }, { name: "Daniel K.", shift: "14:00\\u201322:00 IST", on: false }, { name: "Mei T.", shift: "14:00\\u201322:00 IST", on: false }, { name: "Omar H.", shift: "22:00\\u201306:00 IST", on: false }, { name: "Grace W.", shift: "Float", on: true }], field: [{ name: "Luis G.", skills: ["Network", "Server"], base: "Hyderabad" }, { name: "Tanya W.", skills: ["Network", "CCTV"], base: "Haridwar" }, { name: "Ben K.", skills: ["Server", "CAD"], base: "Halol" }, { name: "Rosa M.", skills: ["CAD", "Printers"], base: "Vadodara" }, { name: "Derek S.", skills: ["Network", "Server"], base: "Chennai" }, { name: "Nina P.", skills: ["CCTV", "Printers"], base: "Mumbai" }, { name: "Omar T.", skills: ["Network", "CAD"], base: "Kuwait (Shuaiba)" }, { name: "Jill C.", skills: ["Server", "Printers"], base: "Ras Al Khaimah" }, { name: "Sam H.", skills: ["Network", "Server", "CCTV"], base: "Jeddah" }, { name: "Ivy L.", skills: ["CAD", "CCTV"], base: "Sudair" }, { name: "Pete R.", skills: ["Network", "Printers"], base: "Cairo (partner)" }, { name: "Kara D.", skills: ["Server", "CAD"], base: "Binh Duong" }] }')
+# Wave 16: the next sites to separate from the parent's shared IT
+rep_literal('const mbe = [', 'const mbe = [["Pune", "MH"], ["Kolkata", "WB"], ["Indore", "MP"], ["Ras Al Khaimah", "AE"], ["Jeddah", "SA"], ["Ghazali", "KW"], ["Binh Duong", "VN"], ["Cairo", "EG"]]')
+rep_exact('name: r ? `${["Riverbend", "Oak Hollow"][Math.floor(s / 4)]} Dental Care \\u2013 ${n}` : `${s % 2 ? "PDS Clinic #" + Qt(1199 + s, 4) : "Smile Generation"} \\u2013 ${n} ${["Gateway", "Commons", "Marketplace", "Crossing"][s % 4]}`',
+          'name: r ? `Kirby ${n} ${["Service Centre", "Warehouse"][Math.floor(s / 4)]}` : `Kirby ${n} ${["Sales Office", "Project Office", "Erection Yard", "Spares Depot"][s % 4]}`')
+
+# each site's real edge device
+rep_exact('[i(`vc-edge-${n}-01`, "edge", "VeloCloud edge", "VeloCloud")', '[i(`vc-edge-${n}-01`, "edge", KX_EDGE(n), "VeloCloud")')
+
+
+i = s.find('payments: { name: "Weighbridge PC back online"'); j = s.find('starter: { name: "New starter request"', i)
+s = s[:i] + s[i:j].replace('"Billing Specialist"', '"Logistics Executive"') + s[j:]
+
+# Site 360 people mix: mostly production staff, a few shift coordinators and finance
+rep_exact('role: o % 5 === 3 ? "Billing Specialist" : o % 2 === 0 ? "Dental Assistant" : "Front Desk Coordinator"', 'role: o % 9 === 4 ? "Front Desk Coordinator" : o % 4 === 3 ? "Billing Specialist" : "Dental Assistant"')
+rep_exact('children: ["Office manager: ", a.jsx("span"', 'children: ["Site IT coordinator: ", a.jsx("span"')
+# Site Cutover is the separation of 22 sites from the parent's shared IT
+rep_exact('sub: `${Kr.newClinicsPerYear}+ new clinics a year, around 1,600 over 10 years. One standard kit and one board for De Novo builds and acquired practices.`', 'sub: "22 sites moving off the parent\'s shared IT onto Kirby\'s own network, identity and SAP. One standard kit and one board for full cutovers and separations."')
+rep_exact('children: ["Same kit, same checks, every clinic: ", Kr.newClinicsPerYear, "+ new clinics a year without matching headcount growth."', 'children: ["Same kit, same checks, every site: 22 sites cut over in four waves without adding headcount."')
+
+# unit labels that are plain words
+s = s.replace('sub: "clinics"', 'sub: "sites"').replace('children: "clinics" })', 'children: "sites" })').replace('sub: "clinic"', 'sub: "site"')
+
+# entity pickers read the renamed ids
+rep_exact(r"/\b(dc2-[\w-]+|(?:ws|img|qnap|srv|prn|sw|vm)-\d{4}-?\w*|prisma-tun-\d+|eks-[\w-]+)/", r"/\b(hyd-[\w-]+|(?:ws|img|nas|srv|prn|sw|vm|edge)-\d{4}-?\w*|gp-tun-\d+|eks-[\w-]+)/")
+rep_exact(r"/(dc2-[\w-]+|prisma-tun-\d+|dx-dc2-01|Ring-2 Clinics|aws-\w+)/", r"/(hyd-[\w-]+|gp-tun-\d+|dx-hyd-01|Ring-2 Sites|aws-\w+)/")
+
+# command bar: carriers and regions by their Kirby names
+rep_exact(r'if (i = n.match(/^show\s+clinics\s+on\s+(zayo|carrier b|carrier c)(?:\s+in\s+(west|southwest|central|southeast|east))?$/)) {' + '\n' + r'      const r = i[1] === "zayo" ? "Zayo" : i[1] === "carrier b" ? "Carrier B" : "Carrier C", o = i[2] ? i[2].charAt(0).toUpperCase() + i[2].slice(1) : "All";',
+          r'if (i = n.match(/^show\s+(?:clinics|sites)\s+on\s+(airtel|jio|tata tele|kems|stc|etisalat|vnpt|fpt|vodafone|moc)(?:\s+in\s+(.+))?$/)) {' + '\n' + r'      const r = { airtel: "Airtel", jio: "Jio", "tata tele": "Tata Tele", kems: "KEMS", stc: "STC", etisalat: "Etisalat", vnpt: "VNPT", fpt: "FPT", vodafone: "Vodafone", moc: "MOC" }[i[1]], o = i[2] ? wa.find((x) => x.toLowerCase().startsWith(i[2].toLowerCase())) || "All" : "All";')
+rep_exact(r"/(vm|prn|ws|qnap)-\d{4}[-\w]*|ZAY-CKT-\d+|#\d{4}/", r"/(vm|prn|ws|nas|edge)-\d{4}[-\w]*|[A-Z]{3}-CKT-\d+|#\d{4}/")
+# business service tiles at Kirby scale
+rep_exact('return 9.4 + qe("svE", s, 40) * 0.5 +', 'return 2.2 + qe("svE", s, 40) * 0.3 +')
+rep_exact('return Math.max(20, 182 * ha(n) + qe("svP", s, 20) * 14);', 'return Math.max(6, 11 * ha(n) + qe("svP", s, 20) * 3);')
+rep_exact('kpi: "Approvals per minute", unit: ""', 'kpi: "E-invoices posted per hour", unit: ""')
+# site icon: a building, not a stethoscope
+rep_exact('Stethoscope: t_', 'Stethoscope: Pz')
+
 open(P('app.k0.js'), 'w').write(s)
 print('ok', len(s))

@@ -35,5 +35,5 @@ function HO(e11, t) {
     delete f.reserved, f.health = Hk(f);
   });
   const ids = (a) => a.filter(Boolean).map((f) => f.id);
-  return { heroSeg: ids(kw), s1: ids(mpls), s7: ids(e11.filter((f) => !f.named)), s8: ids(e11.filter((f) => f.tz === "PT")), atl: ids(south), tampa: ids(guj), edge: ids(edge), esx: ids(esx), austin: ids(kw), vmd: ids(vmd) };
+  return { heroSeg: ids(kw), s1: ids(mpls), s7: ids(e11.filter((f) => !f.named && f.kind !== "Sales office").concat(e11.filter((f) => f.kind === "Sales office")).slice(0, 8)), s8: ids(e11.filter((f) => f.tz === "PT")), atl: ids(south), tampa: ids(guj), edge: ids(edge), esx: ids(esx), austin: ids(kw), vmd: ids(vmd) };
 }
