@@ -11,7 +11,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, decodeURICom
   const b = await chromium.launch({ args: ['--force-device-scale-factor=1', '--disable-gpu-vsync'] });
   const pg = await b.newPage({ viewport: { width: 1920, height: 1080 } });
   const errs = []; pg.on('pageerror', (e) => errs.push(e.message)); pg.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
-  await pg.goto(`http://localhost:${PORT}/director.html`);
+  await pg.goto(`http://localhost:${PORT}/director.html?hub=${film.hub || 'hub.html'}`);
   await pg.waitForFunction(() => window.D && D.ready(), null, { timeout: 30000 });
   await pg.waitForTimeout(2500);
   const cdp = await pg.context().newCDPSession(pg);
@@ -24,7 +24,8 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, decodeURICom
   const E = (fn, ...a) => pg.evaluate(([fn, a]) => { const parts = fn.split('.'); let o = window; for (const p of parts.slice(0, -1)) o = o[p]; return o[parts.at(-1)](...a); }, [fn, a]);
   const now = () => (t0 == null ? 0 : Date.now() / 1000 - wall0);
   let wall0 = 0;
-  const ctx = { pg, E, D: (fn, ...a) => E('D.' + fn, ...a), H: (fn, ...a) => E('D.H', fn, ...a), wait: (s) => pg.waitForTimeout(s * 1000), mark: (k, v) => marks.push({ t: now(), k, v }), ev: (f, a) => pg.evaluate(f, a) };
+  const VO = film.vo ? JSON.parse(fs.readFileSync(path.join(ROOT, film.vo, 'durations.json'))) : {};
+  const ctx = { say: (id) => { marks.push({ t: now(), k: 'vo', v: id }); return VO[id] || 0; }, pg, E, D: (fn, ...a) => E('D.' + fn, ...a), H: (fn, ...a) => E('D.H', fn, ...a), wait: (s) => pg.waitForTimeout(s * 1000), mark: (k, v) => marks.push({ t: now(), k, v }), ev: (f, a) => pg.evaluate(f, a) };
   await film.setup(ctx);
   await pg.waitForTimeout(600);
   await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 90, maxWidth: 1920, maxHeight: 1080, everyNthFrame: 1 });

@@ -1,0 +1,20 @@
+{
+ "hook": "Every fibre cut. Every flapping circuit. Every alert at two in the morning.",
+ "stat1": "For more than ninety percent of mid-size and large enterprises, one hour of downtime now costs over three hundred thousand dollars.",
+ "stat2": "Thirty percent of I T service outages start in the network.",
+ "stat3": "And a third of major network outages are caused by a third-party network provider. Something your team does not control.",
+ "pivot": "This is where the Intelligent Operations Hub takes over.",
+ "kick": "No war room. No alert storm. Just one incident, worked from start to finish.",
+ "tools": "It works with the tools you already run. Ops Ramp watches the estate. ServiceNow keeps the record. Copilot Studio correlates, decides, and runs the runbooks. Key Vault guards every credential. And Microsoft Teams keeps everyone informed.",
+ "s1": "Five sales offices on the same carrier slow down within minutes. Site health drops, and latency to the hub climbs.",
+ "s2": "Alerts from monitoring and the S D WAN pour in, and the service desk starts taking calls.",
+ "s3": "Instead of a ticket for every alert, the hub correlates them into one incident. Same carrier, same region, same time window. And it shows what was ruled out, with the evidence.",
+ "s4": "From the incident, drill into any site, and down the fault path, from people to cloud. The fault is the carrier circuit. Not the LAN, not the edge, not the data centre.",
+ "s5": "The fix is a pre-approved runbook. A person stays over the loop, with ten seconds to stop it. The credential is checked out from Key Vault, and all five offices move to their four G backup.",
+ "s6": "One carrier case is raised for the whole segment, with the loss, jitter, and traceroute evidence already attached.",
+ "s7": "Every site contact gets a plain-language update in Teams. What happened, who owns it, and what to do next.",
+ "s8": "And every step is written back to the ServiceNow record, with a complete audit trail.",
+ "close": "One incident, instead of ten alerts and four calls. Five offices back online in under a minute. One carrier case, with the evidence attached.",
+ "tag": "Carrier outages, handled end to end.",
+ "end": "Movate. Your applied A I partner."
+}

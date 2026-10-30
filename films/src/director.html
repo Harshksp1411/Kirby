@@ -46,13 +46,22 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#1a0f18
 #cursor .ring{position:absolute;left:-14px;top:-14px;width:28px;height:28px;border-radius:50%;border:3px solid var(--yellow);opacity:0}
 #cursor.click .ring{animation:ring .6s ease-out}
 @keyframes ring{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(1.8)}}
+
+#lower .tl{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+#lower .tl span{display:inline-flex;align-items:center;gap:7px;background:#262126;color:#EDE6EC;font-size:16px;font-weight:600;padding:4px 10px 4px 8px;border-radius:6px}
+#lower .tl i{width:16px;height:16px;border-radius:4px;display:inline-block}
+#tools{position:absolute;left:150px;top:330px;display:grid;grid-template-columns:repeat(3,520px);gap:26px 28px}
+.tc{display:flex;align-items:center;gap:20px;min-height:96px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:18px 22px;opacity:0;transform:translateY(20px);transition:all .6s cubic-bezier(.2,.8,.2,1)}
+.tc.in{opacity:1;transform:none}
+.tc i{width:58px;height:58px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:#fff;font-style:normal;font-weight:800;font-size:22px;flex:none}
+.tc b{display:block;color:#fff;font-size:27px;font-weight:700}.tc span{color:rgba(255,255,255,.7);font-size:19px;font-weight:600}
 </style></head>
 <body><div id="stage">
-<div id="cam"><iframe id="hub" src="hub.html"></iframe></div>
+<div id="cam"><iframe id="hub"></iframe></div>
 <div id="tint"></div>
 <div id="spot"></div>
 <div id="txt"></div>
-<div id="lower"><span class="n"></span><span class="t"></span></div>
+<div id="lower"><span class="n"></span><span class="t"></span><div class="tl"></div></div><div id="tools"></div>
 <div id="badge"><b>2×</b> SPEED</div>
 <img id="logo" src="movate_full_white.png">
 <div id="bar"></div>
@@ -60,6 +69,7 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#1a0f18
 <div id="endcard"><img src="movate_mark.png"><div>Your Applied AI Partner</div></div>
 </div>
 <script>
+document.getElementById("hub").src = new URLSearchParams(location.search).get("hub") || "hub.html";
 const B = 1.25, $ = (s) => document.querySelector(s);
 const cam = { k: 1, tx: 0, ty: 0 };
 const hubWin = () => $("#hub").contentWindow, hubDoc = () => $("#hub").contentDocument;
@@ -69,11 +79,15 @@ const D = window.D = {
   blur(on) { $("#cam").classList.toggle("blur", on); $("#tint").classList.toggle("on", on); },
   logo(on) { $("#logo").classList.toggle("on", on); },
   bar(on) { $("#bar").classList.toggle("on", on); },
-  clearText(fade = true) { const t = $("#txt"); [...t.children].forEach((c) => { c.classList.add("out"); c.classList.remove("in"); }); setTimeout(() => { if (fade) t.innerHTML = ""; }, 750); },
+  clearText() { const old = [...$("#txt").children]; old.forEach((c) => { c.classList.add("out"); c.classList.remove("in"); }); setTimeout(() => old.forEach((c) => c.remove()), 750); },
   line(html, cls, x, y, delay = 0, extra = "") { const d = document.createElement("div"); d.className = "line " + cls; d.innerHTML = html; d.style.left = x + "px"; d.style.top = y + "px"; if (extra) d.style.cssText += extra; $("#txt").appendChild(d); setTimeout(() => d.classList.add("in"), 40 + delay); return d; },
   count(el, to, prefix = "", suffix = "", ms = 1400) { const t0 = performance.now(); const f = (t) => { const p = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - p, 3); el.textContent = prefix + Math.round(to * e) + suffix; if (p < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); },
   stat(big, n, prefix, suffix, text, src) { D.clearText(); setTimeout(() => { const b = D.line(big, "big y", 150, 330); if (n != null) D.count(b, n, prefix, suffix); D.line(text, "mid", 154, 500, 350, "width:1300px"); D.line(src, "src", 156, 640 + (text.length > 70 ? 54 : 0), 700); }, 760); },
-  step(n, t) { const l = $("#lower"); l.classList.remove("on"); setTimeout(() => { l.querySelector(".n").textContent = "STEP " + String(n).padStart(2, "0"); l.querySelector(".t").textContent = t; l.classList.add("on"); }, n > 1 ? 380 : 0); },
+  TOOL: { OpsRamp: ["OR", "#1F5BA8"], ServiceNow: ["SN", "#293E40"], "Copilot Studio": ["CS", "linear-gradient(135deg,#0F6CBD,#5B5FC7 55%,#C239B3)"], "Key Vault": ["KV", "#0078D4"], "Microsoft Teams": ["T", "#5B5FC7"], "SD-WAN": ["SD", "#00838F"], "Carrier portal": ["CP", "#4E3047"], "Voice agent": ["VA", "#13856B"], "Intune": ["IN", "#0E7AD8"], "Defender": ["DF", "#2B6CB0"], "Sentinel": ["SE", "#3B4BA8"], "Entra ID": ["EN", "#0F6CBD"], "vCenter": ["VC", "#717074"], "iLO": ["iL", "#01A982"], "Endpoint Analytics": ["EA", "#7A3E6E"], "NetWorker": ["NW", "#4A6378"] },
+  chip(name) { const t = D.TOOL[name] || ["\u2022", "#555"]; return `<span><i style="background:${t[1]}"></i>${name}</span>`; },
+  step(n, t, tools) { const l = $("#lower"); l.classList.remove("on"); setTimeout(() => { l.querySelector(".n").textContent = "STEP " + String(n).padStart(2, "0"); l.querySelector(".t").textContent = t; l.querySelector(".tl").innerHTML = (tools || []).map(D.chip).join(""); l.classList.add("on"); }, n > 1 ? 380 : 0); },
+  tools(list, gapMs) { const g = $("#tools"); g.innerHTML = list.map(([n, r]) => { const t = D.TOOL[n] || ["\u2022", "#555"]; return `<div class="tc"><i style="background:${t[1]}">${t[0]}</i><div><b>${n}</b><span>${r}</span></div></div>`; }).join(""); [...g.children].forEach((c, i) => setTimeout(() => c.classList.add("in"), 200 + i * (gapMs || 1500))); },
+  toolsOff() { [...$("#tools").children].forEach((c) => c.classList.remove("in")); },
   stepOff() { $("#lower").classList.remove("on"); },
   speed(on) { $("#badge").classList.toggle("on", on); },
   end(on) { $("#endcard").classList.toggle("on", on); },
