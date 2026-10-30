@@ -2,8 +2,8 @@
 
 Demonstration console for the India Global IT Hub: Service Desk, NOC, SOC and cloud operations.
 
-- 20 screens, with Live Demos as the last menu item
-- 20 live demos built from the NOC & SOC demo scope
+- 25 screens, plus Live Demos as the last menu item
+- 10 live demos on OpsRamp, Sentinel, Defender and ServiceNow
 
 Plain HTML, CSS and JavaScript with no build step and no dependencies. To publish, turn on GitHub Pages from the `main` branch root.
 
