@@ -142,7 +142,7 @@ rep_exact('name: r ? `${["Riverbend", "Oak Hollow"][Math.floor(s / 4)]} Dental C
           'name: r ? `Kirby ${n} ${["Service Centre", "Warehouse"][Math.floor(s / 4)]}` : `Kirby ${n} ${["Sales Office", "Project Office", "Erection Yard", "Spares Depot"][s % 4]}`')
 
 # each site's real edge device
-rep_exact('[i(`vc-edge-${n}-01`, "edge", "VeloCloud edge", "VeloCloud")', '[i(`vc-edge-${n}-01`, "edge", KX_EDGE(n), "VeloCloud")')
+rep_exact('[i(`vc-edge-${n}-01`, "edge", "VeloCloud edge", "VeloCloud")', '[i(`vc-edge-${n}-01`, "edge", KX_EDGE(n), /^Palo/.test(KX_EDGE(n)) ? "Palo Alto" : KX_EDGE(n).split(" ")[0])')
 
 
 i = s.find('payments: { name: "Weighbridge PC back online"'); j = s.find('starter: { name: "New starter request"', i)
@@ -166,12 +166,26 @@ rep_exact(r"/(dc2-[\w-]+|prisma-tun-\d+|dx-dc2-01|Ring-2 Clinics|aws-\w+)/", r"/
 rep_exact(r'if (i = n.match(/^show\s+clinics\s+on\s+(zayo|carrier b|carrier c)(?:\s+in\s+(west|southwest|central|southeast|east))?$/)) {' + '\n' + r'      const r = i[1] === "zayo" ? "Zayo" : i[1] === "carrier b" ? "Carrier B" : "Carrier C", o = i[2] ? i[2].charAt(0).toUpperCase() + i[2].slice(1) : "All";',
           r'if (i = n.match(/^show\s+(?:clinics|sites)\s+on\s+(airtel|jio|tata tele|kems|stc|etisalat|vnpt|fpt|vodafone|moc)(?:\s+in\s+(.+))?$/)) {' + '\n' + r'      const r = { airtel: "Airtel", jio: "Jio", "tata tele": "Tata Tele", kems: "KEMS", stc: "STC", etisalat: "Etisalat", vnpt: "VNPT", fpt: "FPT", vodafone: "Vodafone", moc: "MOC" }[i[1]], o = i[2] ? wa.find((x) => x.toLowerCase().startsWith(i[2].toLowerCase())) || "All" : "All";')
 rep_exact(r"/(vm|prn|ws|qnap)-\d{4}[-\w]*|ZAY-CKT-\d+|#\d{4}/", r"/(vm|prn|ws|nas|edge)-\d{4}[-\w]*|[A-Z]{3}-CKT-\d+|#\d{4}/")
+
+# ---- focus on infrastructure, digital workplace and security: no SAP or business-app screens
+rep_exact('const rV = [...ps.filter((e11) => e11.id !== "servicedesk").map(', 'const rV = [...ps.filter((e11) => e11.id !== "servicedesk" && e11.id !== "databases").map(')
+rep_exact(', { id: "epic", name: "Epic", icon: "Stethoscope", note: "Every demo about Epic, from all towers" }, { id: "ciab"', ', { id: "ciab"')
+rep_exact(', { id: "epic", label: "Epic Experience", icon: "Stethoscope" }', '')
+rep_exact('{ id: "tower-databases", label: "Databases", icon: "Database" }, ', '')
+rep_exact('const BCe = [{ id: "epic", name: "Epic", kpi: "Citrix logon", unit: " s", dp: 1, kinds: ["epic"], page: "epic" }', 'const BCe = [{ id: "epic", name: "Microsoft 365 and Teams", kpi: "Sign-in time", unit: " s", dp: 1, kinds: ["epic"], page: "dex" }')
+rep_exact('{ id: "checkin", name: "Scheduling and check-in", kpi: "Check-in p95", unit: " s", dp: 2, kinds: [], page: "tower-cloud" }', '{ id: "checkin", name: "Identity (AD and Entra ID)", kpi: "Sign-in p95", unit: " s", dp: 2, kinds: [], page: "tower-security" }')
+rep_exact('{ id: "imaging", name: "X-rays and imaging", kpi: "Test X-ray fetch", unit: " s", dp: 1, kinds: ["qnap", "vmdisk"], page: "tower-storage" }', '{ id: "imaging", name: "File and print", kpi: "File open time", unit: " s", dp: 1, kinds: ["qnap", "vmdisk", "spooler"], page: "tower-storage" }')
+rep_exact('{ id: "payments", name: "Card payments",', '{ id: "payments", name: "Internet breakout",')
+rep_exact('epic: { label: "Epic availability", value: e11.epicAvail.toFixed(2) + "%", sub: `Path: ${e11.epicPath === "verona" ? "Verona" : "Rochester"}`', 'epic: { label: "Core services availability", value: e11.epicAvail.toFixed(2) + "%", sub: `Hub path: ${e11.epicPath === "verona" ? "AVS primary" : "AVS DR"}`')
 # business service tiles at Kirby scale
 rep_exact('return 9.4 + qe("svE", s, 40) * 0.5 +', 'return 2.2 + qe("svE", s, 40) * 0.3 +')
 rep_exact('return Math.max(20, 182 * ha(n) + qe("svP", s, 20) * 14);', 'return Math.max(6, 11 * ha(n) + qe("svP", s, 20) * 3);')
-rep_exact('kpi: "Approvals per minute", unit: ""', 'kpi: "E-invoices posted per hour", unit: ""')
+rep_exact('kpi: "Approvals per minute", unit: ""', 'kpi: "Latency to Microsoft 365", unit: " ms"')
 # site icon: a building, not a stethoscope
 rep_exact('Stethoscope: t_', 'Stethoscope: Pz')
+
+# drill-down from anywhere
+s += '\n' + rd('k_drill.js') + '\n'
 
 open(P('app.k0.js'), 'w').write(s)
 print('ok', len(s))
