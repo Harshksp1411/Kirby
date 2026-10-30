@@ -20,6 +20,7 @@ const KXD = (() => {
   const DEV_OF = (c) => { const k = c.issue && c.issue.kind, id = c.id; return { "edge-hw": [`edge-${id}-01`], esxi: [`srv-${id}`, `vm-${id}-app`], psu: [`srv-${id}`], temp: [`srv-${id}`, `ilo-${id}`], drive: [`srv-${id}`], vmdisk: [`vm-${id}-app`], qnap: [`nas-${id}`], switch: [`sw-${id}-01`], ws: [`ws-${id}-01`, `ws-${id}-02`], spooler: [`prn-${id}-01`, `ws-${id}-01`], intune: [`img-${id}-01`], "carrier-down": [`edge-${id}-01`], onlte: [`edge-${id}-01`], jitter: [`edge-${id}-01`] }[k] || []; };
   const NEXT = {
     "carrier-down": [["Steer to backup circuit (RB-003)", "steer"], ["Raise carrier case with evidence (RB-005)", "carrier"]],
+    circuit: [["Steer to backup circuit (RB-003)", "steer"], ["Raise carrier case with evidence (RB-005)", "carrier"]],
     onlte: [["Return to primary when stable (RB-004)", "primary"], ["Raise carrier case with evidence (RB-005)", "carrier"]],
     jitter: [["Steer to backup circuit (RB-003)", "steer"], ["Apply proactive watch (RB-038)", "watch"]],
     "edge-hw": [["Dispatch engineer with a spare edge", "dispatch"], ["Steer to backup circuit (RB-003)", "steer"]],
@@ -33,7 +34,7 @@ const KXD = (() => {
     spooler: [["Restart print spooler (RB-014)", "rb:RB-014"]],
     maint: [["Run site diagnostics", "diag"]]
   };
-  const FORECAST = { jitter: "Jitter is rising about 0.8 ms a minute; the 30 ms limit is likely to be crossed in about 25 minutes.", onlte: "The 4G backup carries the load, but it is near its data cap; on 4G for more than 6 hours it will slow down.", vmdisk: "At the current growth the disk is full in about 3 days.", psu: "With one PSU left, a second failure takes the server down; the risk stays until the part is fitted.", drive: "The drive is predicted to fail within 7 days; RAID 1 still protects the data.", switch: "Port flaps are getting more frequent; at this rate the uplink drops for good within the shift.", ws: "Experience score is falling after the Teams update; more PCs are likely to report the same.", "carrier-down": "Until the carrier splices the fibre, the site stays on backup or down.", "edge-hw": "The site stays down until the replacement edge is fitted.", esxi: "The VM will not come back by itself; file and print stay down until it is restarted.", power: "UPS gives about 45 minutes; after that the cabinet goes dark." };
+  const FORECAST = { circuit: "Loss on the shared segment is climbing; without a steer, Teams calls and file access at every office on it get worse within 15 minutes.", jitter: "Jitter is rising about 0.8 ms a minute; the 30 ms limit is likely to be crossed in about 25 minutes.", onlte: "The 4G backup carries the load, but it is near its data cap; on 4G for more than 6 hours it will slow down.", vmdisk: "At the current growth the disk is full in about 3 days.", psu: "With one PSU left, a second failure takes the server down; the risk stays until the part is fitted.", drive: "The drive is predicted to fail within 7 days; RAID 1 still protects the data.", switch: "Port flaps are getting more frequent; at this rate the uplink drops for good within the shift.", ws: "Experience score is falling after the Teams update; more PCs are likely to report the same.", "carrier-down": "Until the carrier splices the fibre, the site stays on backup or down.", "edge-hw": "The site stays down until the replacement edge is fitted.", esxi: "The VM will not come back by itself; file and print stay down until it is restarted.", power: "UPS gives about 45 minutes; after that the cabinet goes dark." };
 
   let stack = [], root = null, timer = null;
   function ensure() {
@@ -206,7 +207,8 @@ const KXD = (() => {
       const ruled = inc && inc.ruledOut ? inc.ruledOut : [];
       const chain = LAYERS.map(([k, l], idx) => {
         const isF = fault === k || (fault === "power" && ["lan", "edge", "server", "devices"].includes(k)), col = isF ? (c.status === "down" ? C.bad : C.warn) : c.status === "maintenance" ? C.maint : C.ok;
-        const r = ruled.find((x) => new RegExp(l.split(" ")[0], "i").test(x.entity));
+        const KW = { people: /people|user/i, devices: /workstation|\bPC|printer|scanner|endpoint/i, lan: /LAN|switch|Wi-?Fi|access point/i, server: /server|VM\b|storage|vCenter|iLO|NAS|ESXi/i, edge: /edge|router|gateway|VeloCloud|firewall/i, circuit: /circuit|carrier|Airtel|Jio|Tata|KEMS|STC|MPLS/i, core: /Hub|DC2|core|AWS|Azure|AVS|data cent/i };
+        const r = ruled.find((x) => KW[k] && KW[k].test(x.entity));
         const why = isF ? (fault === "power" ? "No power: every device went silent in the same second" : c.issue.text) : r ? "Ruled out: " + r.reason : k === "people" ? `${c.users} people on site` : k === "circuit" ? `${c.carrier} ${c.primaryCircuit.bandwidth} \xB7 ${c.path === "lte" ? "on backup" : "primary active"}` : k === "edge" ? KX_EDGE(c.id) : "Healthy";
         return (idx ? `<div class="kxd-vline"></div>` : "") + `<div class="kxd-layer${isF ? " fault" : ""}"><span class="dot" style="background:${col}"></span><span>${esc(l)}</span><span class="why">${esc(why)}</span></div>`;
       }).join("");
@@ -347,3 +349,5 @@ const KXD = (() => {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else setTimeout(start, 0);
   return { open, close };
 })();
+// presenter hook used by the demo films and the presenter's own scripts
+window.KirbyHub = { open: (x) => Ve(x), pause: (b) => ot((s) => { s.paused = !!b; }), speed: (x) => G9(x), ui: (o) => Qn(o), tool: (id, ref) => Ut(id, { ref: ref || null }), nav: (step) => WM(step), scenario: (id) => tC(id), reset: () => yu(), drill: (v) => KXD.open(v, true), closeDrill: () => KXD.close(), go: (page, arg) => oe(page, arg), site: (id) => De(id), state: () => W.get() };

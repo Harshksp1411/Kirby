@@ -4,9 +4,9 @@ function HO(e11, t) {
   };
   const kw = ["0611", "0415"].map(g);
   kw.forEach((f) => { f.seg = "KEM-SEG-KWT-01"; });
-  const mpls = ["0577", "0614", "0658", "0745", "0788", "0826", "0869"].map(g);
+  const mpls = ["0577", "0614", "0658", "0745", "0788"].map(g);
   mpls.forEach((f) => { f.seg = "AIR-SEG-MPLS-IN"; });
-  const south = ["0703", "0826", "0869", "0912"].map(g);
+  const south = ["0703", "0826", "0869"].map(g);
   south.forEach((f, V) => {
     f.seg = "AIR-SEG-MPLS-SOUTH", V < 1 ? s(f, "down", "carrier-down", "Airtel MPLS fibre fault; no 4G backup on site", "INC0048201") : (s(f, "degraded", "onlte", "Airtel MPLS fibre fault; running on 4G backup", "INC0048201"), f.path = "lte");
   });

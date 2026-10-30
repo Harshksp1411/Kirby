@@ -177,6 +177,13 @@ rep_exact('{ id: "checkin", name: "Scheduling and check-in", kpi: "Check-in p95"
 rep_exact('{ id: "imaging", name: "X-rays and imaging", kpi: "Test X-ray fetch", unit: " s", dp: 1, kinds: ["qnap", "vmdisk"], page: "tower-storage" }', '{ id: "imaging", name: "File and print", kpi: "File open time", unit: " s", dp: 1, kinds: ["qnap", "vmdisk", "spooler"], page: "tower-storage" }')
 rep_exact('{ id: "payments", name: "Card payments",', '{ id: "payments", name: "Internet breakout",')
 rep_exact('epic: { label: "Epic availability", value: e11.epicAvail.toFixed(2) + "%", sub: `Path: ${e11.epicPath === "verona" ? "Verona" : "Rochester"}`', 'epic: { label: "Core services availability", value: e11.epicAvail.toFixed(2) + "%", sub: `Hub path: ${e11.epicPath === "verona" ? "AVS primary" : "AVS DR"}`')
+
+# S1 runs on the five Airtel MPLS sales offices in North and West India (the South three are in the seeded outage)
+import re as _re
+i = s.find('{ id: "S1", parts'); j = s.find('{ id: "S2"', i)
+s = s[:i] + _re.sub(r'\b7\b', '5', s[i:j]).replace('Seven', 'Five') + s[j:]
+i = s.find('function dee()'); j = s.find('function kee()', i)
+s = s[:i] + _re.sub(r'\b14\b', '10', _re.sub(r'\b7\b', '5', s[i:j])) + s[j:]
 # business service tiles at Kirby scale
 rep_exact('return 9.4 + qe("svE", s, 40) * 0.5 +', 'return 2.2 + qe("svE", s, 40) * 0.3 +')
 rep_exact('return Math.max(20, 182 * ha(n) + qe("svP", s, 20) * 14);', 'return Math.max(6, 11 * ha(n) + qe("svP", s, 20) * 3);')

@@ -1,0 +1,40 @@
+// Records a film: serves this folder, opens director.html, runs the timeline module, captures frames with CDP screencast.
+const http = require('http'), fs = require('fs'), path = require('path');
+const { chromium } = require('playwright');
+const ROOT = __dirname, PORT = 8765 + Math.floor(Math.random() * 200);
+const film = require(path.resolve(process.argv[2]));
+const out = path.resolve(process.argv[3] || 'frames');
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.css': 'text/css' };
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, decodeURIComponent(q.url.split('?')[0])); fs.readFile(f, (e, d) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream' }); r.end(d); }); }).listen(PORT);
+(async () => {
+  fs.rmSync(out, { recursive: true, force: true }); fs.mkdirSync(out, { recursive: true });
+  const b = await chromium.launch({ args: ['--force-device-scale-factor=1', '--disable-gpu-vsync'] });
+  const pg = await b.newPage({ viewport: { width: 1920, height: 1080 } });
+  const errs = []; pg.on('pageerror', (e) => errs.push(e.message)); pg.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
+  await pg.goto(`http://localhost:${PORT}/director.html`);
+  await pg.waitForFunction(() => window.D && D.ready(), null, { timeout: 30000 });
+  await pg.waitForTimeout(2500);
+  const cdp = await pg.context().newCDPSession(pg);
+  const frames = []; let n = 0, t0 = null; const marks = [];
+  cdp.on('Page.screencastFrame', async (f) => {
+    const ts = f.metadata.timestamp; if (t0 == null) t0 = ts;
+    const name = `f${String(n++).padStart(6, '0')}.jpg`; fs.writeFileSync(path.join(out, name), Buffer.from(f.data, 'base64')); frames.push([name, ts - t0]);
+    cdp.send('Page.screencastFrameAck', { sessionId: f.sessionId }).catch(() => {});
+  });
+  const E = (fn, ...a) => pg.evaluate(([fn, a]) => { const parts = fn.split('.'); let o = window; for (const p of parts.slice(0, -1)) o = o[p]; return o[parts.at(-1)](...a); }, [fn, a]);
+  const now = () => (t0 == null ? 0 : Date.now() / 1000 - wall0);
+  let wall0 = 0;
+  const ctx = { pg, E, D: (fn, ...a) => E('D.' + fn, ...a), H: (fn, ...a) => E('D.H', fn, ...a), wait: (s) => pg.waitForTimeout(s * 1000), mark: (k, v) => marks.push({ t: now(), k, v }), ev: (f, a) => pg.evaluate(f, a) };
+  await film.setup(ctx);
+  await pg.waitForTimeout(600);
+  await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 90, maxWidth: 1920, maxHeight: 1080, everyNthFrame: 1 });
+  wall0 = Date.now() / 1000;
+  await film.run(ctx);
+  await pg.waitForTimeout(400);
+  await cdp.send('Page.stopScreencast');
+  const end = now();
+  fs.writeFileSync(path.join(out, 'frames.json'), JSON.stringify({ frames, marks, end }, null, 0));
+  console.log('frames', frames.length, 'seconds', end.toFixed(1), 'fps', (frames.length / end).toFixed(1));
+  console.log('errors', JSON.stringify(errs.slice(0, 6)));
+  await b.close(); srv.close();
+})().catch((e) => { console.error(e); process.exit(1); });
