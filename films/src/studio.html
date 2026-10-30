@@ -1,0 +1,196 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>studio</title>
+<style>
+@font-face{font-family:Mr;font-weight:500;src:url(node_modules/@fontsource/manrope/files/manrope-latin-500-normal.woff2)}
+@font-face{font-family:Mr;font-weight:600;src:url(node_modules/@fontsource/manrope/files/manrope-latin-600-normal.woff2)}
+@font-face{font-family:Mr;font-weight:700;src:url(node_modules/@fontsource/manrope/files/manrope-latin-700-normal.woff2)}
+@font-face{font-family:Mr;font-weight:800;src:url(node_modules/@fontsource/manrope/files/manrope-latin-800-normal.woff2)}
+:root{--plum:#4E3047;--deep:#1C0F19;--y:#FFE14D;--mag:#E15AA5;--red:#EE3B33;--org:#F7A541;--ok:#34C27A;--warn:#F5A142;--bad:#F0574A;--card:rgba(255,255,255,.065);--line:rgba(255,255,255,.13);--mute:rgba(255,255,255,.62)}
+*{box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;font-family:Mr,system-ui,sans-serif;color:#fff;background:var(--deep)}
+#bg{position:absolute;inset:0;background:radial-gradient(1400px 900px at 18% 20%,#4A2742 0%,#2A1626 45%,#170C14 100%)}
+#bg::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(1200px 800px at 50% 50%,#000,transparent)}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.35;animation:drift 18s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate(120px,-80px) scale(1.15)}}
+#bar{position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(90deg,#EE3B33,#F15A4A 22%,#F7A541 45%,#FFE14D 60%,#F29A7A 78%,#E15AA5);z-index:50}
+#logo{position:absolute;right:56px;top:44px;height:34px;opacity:.95;z-index:50}
+#scene{position:absolute;inset:0}
+.fx{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.fx.in{opacity:1;transform:none}.fx.out{opacity:0;transform:translateY(-16px)}
+.abs{position:absolute}
+.y{color:var(--y)}
+.big{font-size:150px;font-weight:800;line-height:1;letter-spacing:-.03em}
+.mid{font-size:44px;font-weight:600;line-height:1.25}
+.src{font-size:17px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.hook{font-size:74px;font-weight:700;line-height:1.18;color:rgba(255,255,255,.94)}
+.kick{font-size:96px;font-weight:800;line-height:1.02;letter-spacing:-.02em}
+.h2{font-size:52px;font-weight:800;letter-spacing:-.01em}
+.eyebrow{font-size:16px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--y)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(6px);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.tile{width:46px;height:46px;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:#fff;flex:none}
+.row{display:flex;align-items:center;gap:14px}
+.mute{color:var(--mute)}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 14px 7px 9px;font-weight:700;font-size:18px;background:rgba(255,255,255,.08);border:1px solid var(--line)}
+.spark{width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,#EE3B33,#F7A541 50%,#E15AA5)}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}
+#lower{position:absolute;left:56px;bottom:52px;background:#0E080C;padding:14px 26px 16px 22px;border-left:6px solid var(--y);opacity:0;transform:translateX(-30px);transition:all .6s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 40px rgba(0,0,0,.4);z-index:40}
+#lower.on{opacity:1;transform:none}
+#lower .n{display:block;color:var(--y);font-size:16px;font-weight:800;letter-spacing:.2em}
+#lower .t{display:block;color:#fff;font-size:34px;font-weight:700;margin-top:2px}
+#lower .tl{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+#lower .tl span{display:inline-flex;align-items:center;gap:7px;background:#272027;color:#EDE6EC;font-size:16px;font-weight:600;padding:4px 10px 4px 8px;border-radius:6px}
+#lower .tl i{width:16px;height:16px;border-radius:4px;display:inline-block}
+#endcard{position:absolute;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;gap:120px;opacity:0;transition:opacity .9s;z-index:60}
+#endcard.on{opacity:1}
+#endcard img{height:330px}
+#endcard div{font-size:62px;font-weight:700;color:var(--plum)}
+svg text{font-family:Mr}
+.lines path{fill:none;stroke:url(#gr);stroke-width:3;stroke-dasharray:10 12;animation:flow 1.2s linear infinite;opacity:0;transition:opacity .8s}
+.lines path.in{opacity:.9}
+@keyframes flow{to{stroke-dashoffset:-44}}
+.alert{position:absolute;width:330px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid var(--line);font-size:15px;font-weight:600;transition:all 1.1s cubic-bezier(.65,0,.25,1)}
+.alert b{display:block;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+.layer{display:flex;align-items:center;gap:18px;padding:14px 20px;border-radius:14px;font-size:24px;font-weight:700;transition:all .5s}
+.layer .why{margin-left:auto;font-size:18px;font-weight:600;color:var(--mute);text-align:right}
+.layer.bad{background:rgba(240,87,74,.16);border:1px solid rgba(240,87,74,.55)}
+.layer.bad .why{color:#FF9C8F}
+.step{display:flex;align-items:center;gap:16px;padding:11px 0;font-size:22px;font-weight:700;opacity:.4;transition:opacity .4s}
+.step.on{opacity:1}.step i{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.35);display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:16px}
+.step.done i{background:var(--ok);border-color:var(--ok)}
+.step .tool{margin-left:auto;font-size:15px;color:var(--mute);font-weight:600}
+.msg{border-radius:14px;background:#fff;color:#242424;padding:16px 20px;font-size:19px;line-height:1.45}
+</style></head>
+<body>
+<div id="bg"><div class="blob" style="width:700px;height:700px;left:-120px;top:-160px;background:#E15AA5"></div><div class="blob" style="width:600px;height:600px;right:-100px;bottom:-200px;background:#F7A541;animation-delay:-6s"></div><div class="blob" style="width:520px;height:520px;left:900px;top:520px;background:#EE3B33;opacity:.18;animation-delay:-11s"></div></div>
+<div id="bar"></div>
+<img id="logo" src="movate_full_white.png">
+<div id="scene"></div>
+<div id="lower"><span class="n"></span><span class="t"></span><div class="tl"></div></div>
+<div id="endcard"><img src="movate_mark.png"><div>Your Applied AI Partner</div></div>
+<script>
+const $ = (s) => document.querySelector(s), S = () => $("#scene");
+const TOOL = { OpsRamp: ["OR", "#1F5BA8"], ServiceNow: ["SN", "#2F5B4F"], "Copilot Studio": ["CS", "linear-gradient(135deg,#0F6CBD,#5B5FC7 55%,#C239B3)"], "Key Vault": ["KV", "#0078D4"], "Entra ID": ["ID", "#0F6CBD"], "Microsoft Teams": ["T", "#5B5FC7"], "SD-WAN": ["SD", "#00838F"], "SD-WAN orchestrator": ["SD", "#00838F"], "Carrier portals": ["CP", "#7A4A6E"], "Carrier portal": ["CP", "#7A4A6E"], "Service desk voice and chat": ["VC", "#13856B"], "Voice and chat": ["VC", "#13856B"], vCenter: ["VC", "#6F6E73"], Intune: ["IN", "#0E7AD8"], "Mova iO": ["M", "linear-gradient(135deg,#EE3B33,#F7A541 50%,#E15AA5)"] };
+const tile = (n, sz) => { const t = TOOL[n] || ["•", "#555"]; return `<span class="tile" style="background:${t[1]};${sz ? `width:${sz}px;height:${sz}px;font-size:${sz * 0.37}px` : ""}">${t[0]}</span>`; };
+const el = (html, x, y, w, cls = "", style = "") => { const d = document.createElement("div"); d.className = "abs fx " + cls; d.style.cssText = `left:${x}px;top:${y}px;${w ? `width:${w}px;` : ""}${style}`; d.innerHTML = html; S().appendChild(d); return d; };
+const show = (d, delay = 0) => setTimeout(() => d.classList.add("in"), 40 + delay);
+const agent = (name) => `<span class="pill"><span class="spark"></span>${name}</span>`;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const count = (node, to, ms = 1400, pre = "", suf = "") => { const t0 = performance.now(); const f = (t) => { const p = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - p, 3); node.textContent = pre + Math.round(to * e) + suf; if (p < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); };
+const D = window.D = {
+  ready: () => true,
+  clear() { const old = [...S().children]; old.forEach((c) => { c.classList.add("out"); c.classList.remove("in"); }); setTimeout(() => old.forEach((c) => c.remove()), 750); },
+  logo(on) { $("#logo").style.opacity = on ? .95 : 0; },
+  step(n, t, tools) { const l = $("#lower"); l.classList.remove("on"); setTimeout(() => { l.querySelector(".n").textContent = "STEP " + String(n).padStart(2, "0"); l.querySelector(".t").textContent = t; l.querySelector(".tl").innerHTML = (tools || []).map((x) => { const tt = TOOL[x] || ["", "#555"]; return `<span><i style="background:${tt[1]}"></i>${x}</span>`; }).join(""); l.classList.add("on"); }, 380); },
+  stepOff() { $("#lower").classList.remove("on"); },
+  end(on) { $("#endcard").classList.toggle("on", on); },
+  line(html, cls, x, y, delay = 0, style = "") { const d = el(html, x, y, 0, cls, style); show(d, delay); return d; },
+  stat(big, n, pre, suf, text, src) { D.clear(); setTimeout(() => { const b = D.line(big, "big y", 150, 330); count(b, n, 1400, pre, suf); D.line(text, "mid", 154, 500, 350, "width:1300px"); D.line(src, "src", 156, 640 + (text.length > 70 ? 54 : 0), 700); }, 760); },
+
+  // ---- integration map
+  arch(timing) {
+    const T = timing || [0, 2500, 5200, 8200, 11000, 14000];
+    const W = 1920;
+    D.line('<div class="eyebrow">Example NOC deployment</div><div class="h2" style="margin-top:8px">How Mova iO plugs in</div>', "", 150, 110, 0);
+    const center = el(`<div class="card" style="padding:26px 30px;text-align:center;border:1px solid rgba(255,225,77,.45);box-shadow:0 0 0 1px rgba(255,225,77,.15),0 30px 90px rgba(225,90,165,.25)"><div class="row" style="justify-content:center;gap:16px"><img src="movate_mark.png" style="height:58px"><div style="text-align:left"><div style="font-size:40px;font-weight:800">Mova iO</div><div class="mute" style="font-size:18px;font-weight:600">Operations agent fleet</div></div></div><div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px;width:520px">${["Event correlator", "Triage orchestrator", "Guided resolution assistant", "Failure predictor", "Knowledge twin"].map((a) => `<span class="pill" style="font-size:15px;padding:5px 11px 5px 7px"><span class="spark" style="width:18px;height:18px"></span>${a}</span>`).join("")}</div><div class="row" style="justify-content:center;margin-top:16px;gap:10px;font-size:16px;font-weight:700" class="mute">${tile("Copilot Studio", 30)}<span class="mute">Built on Copilot Studio</span></div></div>`, 690, 380, 580);
+    show(center, T[0]);
+    const group = (title, items, x, y, w, d) => { const g = el(`<div class="card" style="padding:18px 20px"><div class="eyebrow" style="color:#F7A541;margin-bottom:12px">${title}</div>${items.map(([n, r]) => `<div class="row" style="margin:10px 0">${tile(n, 40)}<div><div style="font-size:21px;font-weight:700">${n}</div><div class="mute" style="font-size:15px;font-weight:600">${r}</div></div></div>`).join("")}</div>`, x, y, w); show(g, d); return g; };
+    group("Signals in", [["OpsRamp", "Monitoring and events"], ["SD-WAN", "Link health at every site"], ["Voice and chat", "Calls and chats to the service desk"]], 110, 330, 400, T[1]);
+    group("System of record", [["ServiceNow", "Incidents, changes, CMDB"]], 760, 150, 420, T[2]);
+    group("Actions", [["SD-WAN orchestrator", "Steer paths to backup"], ["Carrier portals", "Open cases with evidence"], ["vCenter", "Restart hosts and VMs"]], 1410, 330, 400, T[3]);
+    group("Guardrails and people", [["Key Vault", "A credential for every action"], ["Microsoft Teams", "Approvals and updates"]], 700, 800, 560, T[4]);
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("width", W); svg.setAttribute("height", 1080); svg.setAttribute("class", "abs lines"); svg.style.cssText = "left:0;top:0;pointer-events:none";
+    svg.innerHTML = `<defs><linearGradient id="gr" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1920" y2="1080"><stop offset="0" stop-color="#F7A541"/><stop offset="1" stop-color="#E15AA5"/></linearGradient></defs>
+      <path d="M510 520 C 600 520, 610 560, 690 560"/><path d="M970 330 C 970 350, 980 360, 980 380"/><path d="M1270 560 C 1340 560, 1350 520, 1410 520"/><path d="M980 715 C 980 750, 980 770, 980 800"/>`;
+    S().insertBefore(svg, S().firstChild); svg.classList.add("fx");
+    [...svg.querySelectorAll("path")].forEach((p, i) => setTimeout(() => p.classList.add("in"), T[i + 1] + 400));
+    show(svg, 0);
+  },
+
+  // ---- ITOps twin: five offices go amber
+  twin() {
+    D.line('<div class="eyebrow">ITOps twin</div><div class="h2" style="margin-top:8px">Live estate, one view</div>', "", 150, 110, 0);
+    const sites = [["Mumbai Sales Office", 1], ["Pune Sales Office", 1], ["Delhi Sales Office", 1], ["Indore Sales Office", 1], ["Kolkata Sales Office", 1], ["Hyderabad City Office", 0], ["Halol Plant", 0], ["Haridwar Plant", 0], ["Shuaiba Plant", 0], ["Jeddah Office", 0], ["RAK Plant", 0], ["Vietnam HO", 0]];
+    const grid = el(`<div style="display:grid;grid-template-columns:repeat(3,250px);gap:14px">${sites.map(([n], i) => `<div class="card site" data-i="${i}" style="padding:16px 18px;border-radius:14px"><div class="row" style="gap:10px"><span class="dot" style="background:var(--ok)"></span><span style="font-size:18px;font-weight:700">${n}</span></div><div class="mute lat" style="font-size:15px;margin-top:6px;font-weight:600">38 ms to hub</div></div>`).join("")}</div>`, 150, 280, 790);
+    show(grid, 200);
+    const chart = el(`<div class="card" style="padding:22px 26px"><div class="row" style="justify-content:space-between"><div style="font-size:22px;font-weight:700">Latency to hub, carrier segment</div><div class="mute" style="font-size:16px;font-weight:600">last 15 min</div></div><svg width="740" height="250" style="margin-top:12px"><polyline id="lat" fill="none" stroke="#F7A541" stroke-width="4" points=""/><line x1="0" x2="740" y1="160" y2="160" stroke="rgba(255,255,255,.25)" stroke-dasharray="6 8"/><text x="745" y="165" fill="rgba(255,255,255,.55)" font-size="14" text-anchor="end" dy="-8">threshold</text></svg><div class="row" style="gap:40px;margin-top:10px"><div><div id="na" style="font-size:54px;font-weight:800">0</div><div class="mute" style="font-weight:600">alerts</div></div><div><div id="nc" style="font-size:54px;font-weight:800">0</div><div class="mute" style="font-weight:600">service desk calls</div></div><div><div id="nl" style="font-size:54px;font-weight:800;color:var(--y)">38 ms</div><div class="mute" style="font-weight:600">latency</div></div></div></div>`, 1000, 280, 790);
+    show(chart, 500);
+    let k = 0; const pts = []; const lat = $("#lat");
+    const tick = setInterval(() => { k++; const v = k < 10 ? 40 + Math.random() * 6 : Math.min(410, 40 + (k - 10) * 26 + Math.random() * 18); pts.push(`${(k * 13).toFixed(0)},${(240 - v * 0.52).toFixed(0)}`); lat.setAttribute("points", pts.join(" ")); if (k > 10) $("#nl").textContent = Math.round(v) + " ms"; if (k >= 56) clearInterval(tick); }, 110);
+    [...grid.querySelectorAll(".site")].slice(0, 5).forEach((s, i) => setTimeout(() => { s.querySelector(".dot").style.background = "var(--warn)"; s.style.borderColor = "rgba(245,161,66,.7)"; s.style.background = "rgba(245,161,66,.12)"; s.querySelector(".lat").textContent = (320 + i * 18) + " ms · loss " + (3.4 + i * 0.3).toFixed(1) + "%"; s.querySelector(".lat").style.color = "#FFC27A"; }, 1700 + i * 650));
+    setTimeout(() => count($("#na"), 10, 3200), 1700); setTimeout(() => count($("#nc"), 4, 2600), 3600);
+  },
+
+  // ---- correlation: 14 signals into one incident
+  correlate() {
+    D.line('<div class="eyebrow">Event correlator</div><div class="h2" style="margin-top:8px">Fourteen signals, one incident</div>', "", 150, 110, 0);
+    const sig = [["CRITICAL", "Packet loss 4.1% · MUM circuit"], ["ERROR", "SD-WAN link degraded · PUN"], ["CRITICAL", "Packet loss 3.8% · DEL circuit"], ["WARNING", "Latency 340 ms · IND"], ["ERROR", "SD-WAN link degraded · KOL"], ["CRITICAL", "Packet loss 4.4% · PUN circuit"], ["WARNING", "Jitter 38 ms · MUM"], ["ERROR", "Tunnel unstable · DEL"], ["WARNING", "Latency 360 ms · KOL"], ["CRITICAL", "Packet loss 3.9% · IND circuit"], ["CALL", "\"Teams keeps dropping\" · Mumbai"], ["CALL", "\"Files won't open\" · Pune"], ["CALL", "\"Everything is slow\" · Delhi"], ["CALL", "\"Calls freezing\" · Kolkata"]];
+    const col = { CRITICAL: "#FF7A6E", ERROR: "#FF9F5A", WARNING: "#FFD36B", CALL: "#7FD3B3" };
+    const cards = sig.map(([s, m], i) => { const c = el(`<b style="color:${col[s]}">${s}</b>${m}`, 150 + (i % 2) * 350, 270 + Math.floor(i / 2) * 82, 330, "alert"); show(c, 120 * i); return c; });
+    const inc = el(`<div class="card" style="padding:28px 30px;border-color:rgba(255,225,77,.5)"><div class="row" style="justify-content:space-between"><span class="pill" style="background:rgba(245,161,66,.2);border-color:rgba(245,161,66,.6)">P2</span><span class="mute" style="font-weight:700">INC0024817</span></div><div style="font-size:34px;font-weight:800;margin-top:16px;line-height:1.2">Carrier degradation on a shared MPLS segment: 5 offices</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">${["Same carrier", "Same region", "15-minute window"].map((t) => `<span class="pill">${t}</span>`).join("")}</div><div class="row" style="margin-top:22px;gap:40px"><div><div id="sg" style="font-size:52px;font-weight:800;color:var(--y)">0</div><div class="mute" style="font-weight:600">signals grouped</div></div><div><div style="font-size:52px;font-weight:800">1</div><div class="mute" style="font-weight:600">ServiceNow incident</div></div></div><div style="margin-top:20px">${agent("Event correlator")}</div></div>`, 1080, 300, 680);
+    setTimeout(() => { show(inc); cards.forEach((c, i) => setTimeout(() => { c.style.left = "1250px"; c.style.top = "520px"; c.style.opacity = "0"; c.style.transform = "scale(.6)"; }, 160 * i)); setTimeout(() => count($("#sg"), 14, 2200), 300); }, 3200);
+  },
+
+  // ---- root cause: fault path with ruled-out layers
+  rootcause() {
+    D.line('<div class="eyebrow">Triage orchestrator</div><div class="h2" style="margin-top:8px">Root cause, with evidence</div>', "", 150, 110, 0);
+    const L = [["People", "40 people affected across 5 offices", 0], ["PCs and devices", "Ruled out: endpoint health normal", 0], ["Site LAN and Wi-Fi", "Ruled out: switches and Wi-Fi healthy at all 5", 0], ["Site edge", "Ruled out: routers up, CPU normal", 0], ["Carrier circuit", "Loss 3.4 to 4.4%, jitter 38 ms on one MPLS segment", 1], ["Hub and cloud", "Ruled out: other carriers into the same hub are fine", 0]];
+    const box = el(`<div class="card" style="padding:18px">${L.map(([n, w, bad], i) => `<div class="layer" data-i="${i}" style="opacity:.35"><span class="dot" style="width:16px;height:16px;background:rgba(255,255,255,.4)"></span>${n}<span class="why">${w}</span></div>`).join("")}</div>`, 150, 270, 1060);
+    show(box, 100);
+    const rows = [...box.querySelectorAll(".layer")];
+    const order = [0, 1, 2, 3, 5, 4];
+    order.forEach((i, k) => setTimeout(() => { const r = rows[i]; r.style.opacity = 1; const bad = L[i][2]; r.querySelector(".dot").style.background = bad ? "var(--bad)" : "var(--ok)"; if (bad) r.classList.add("bad"); }, 900 + k * 1300));
+    const conf = el(`<div class="card" style="padding:28px;text-align:center"><svg width="230" height="230" viewBox="0 0 230 230"><circle cx="115" cy="115" r="96" stroke="rgba(255,255,255,.1)" stroke-width="18" fill="none"/><circle id="ring" cx="115" cy="115" r="96" stroke="url(#g2)" stroke-width="18" fill="none" stroke-linecap="round" stroke-dasharray="603" stroke-dashoffset="603" transform="rotate(-90 115 115)" style="transition:stroke-dashoffset 2s cubic-bezier(.2,.8,.2,1)"/><defs><linearGradient id="g2"><stop offset="0" stop-color="#F7A541"/><stop offset="1" stop-color="#E15AA5"/></linearGradient></defs><text x="115" y="128" text-anchor="middle" font-size="54" font-weight="800" fill="#fff" id="cf">0%</text></svg><div style="font-size:22px;font-weight:700;margin-top:8px">confidence</div><div class="mute" style="font-size:17px;font-weight:600;margin-top:4px">Carrier circuit, one MPLS segment</div><div style="margin-top:18px">${agent("Triage orchestrator")}</div></div>`, 1290, 270, 480);
+    setTimeout(() => { show(conf); setTimeout(() => { $("#ring").style.strokeDashoffset = 603 * 0.05; count($("#cf"), 95, 2000, "", "%"); }, 400); }, 7200);
+  },
+
+  // ---- runbook with a human in the loop
+  runbook() {
+    D.line('<div class="eyebrow">Guided resolution assistant</div><div class="h2" style="margin-top:8px">Fix it, with a human in the loop</div>', "", 150, 110, 0);
+    const steps = [["Detect", "OpsRamp"], ["Correlate", "Mova iO"], ["Diagnose", "Mova iO"], ["Approve", "Human in the loop"], ["Check out credential", "Key Vault"], ["Steer 5 offices to 4G backup", "SD-WAN orchestrator"], ["Verify", "OpsRamp"], ["Update the record", "ServiceNow"]];
+    const rb = el(`<div class="card" style="padding:24px 28px"><div class="row" style="justify-content:space-between"><div style="font-size:24px;font-weight:800">RB-003 · Steer to backup</div><span class="pill" style="font-size:15px">Pre-approved for regional carrier events</span></div><div id="cd" class="row" style="margin:16px 0 6px;padding:14px 16px;border-radius:12px;background:rgba(255,225,77,.12);border:1px solid rgba(255,225,77,.45);font-size:20px;font-weight:700;gap:16px"><span>Executing in <span id="cdn" style="color:var(--y)">10</span> s unless stopped</span><div style="flex:1;height:8px;background:rgba(255,255,255,.12);border-radius:9px;overflow:hidden"><div id="cdb" style="height:100%;width:100%;background:var(--y);transition:width 10s linear"></div></div><span style="border:2px solid #FF8C80;color:#FF8C80;border-radius:8px;padding:4px 14px">Stop</span></div>${steps.map(([n, t], i) => `<div class="step" data-i="${i}"><i>${i + 1}</i>${n}<span class="tool">${t}</span></div>`).join("")}</div>`, 150, 260, 880);
+    show(rb, 100);
+    const st = [...rb.querySelectorAll(".step")];
+    const done = (i) => { st[i].classList.add("on", "done"); st[i].querySelector("i").textContent = "✓"; };
+    [0, 1, 2].forEach((i) => setTimeout(() => done(i), 500 + i * 300));
+    setTimeout(() => { st[3].classList.add("on"); $("#cdb").style.width = "0%"; let n = 10; const t = setInterval(() => { n--; $("#cdn").textContent = n; if (n <= 0) { clearInterval(t); done(3); $("#cd").innerHTML = '<span style="color:#7FE0AE">No stop received: proceeding</span>'; } }, 1000); }, 1600);
+    [4, 5, 6, 7].forEach((i, k) => setTimeout(() => { st[i].classList.add("on"); setTimeout(() => done(i), 900); }, 12000 + k * 1300));
+    const offices = ["Mumbai", "Pune", "Delhi", "Indore", "Kolkata"];
+    const res = el(`<div class="card" style="padding:24px 26px"><div style="font-size:22px;font-weight:800;margin-bottom:12px">Offices on the segment</div>${offices.map((o, i) => `<div class="row of" style="justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:20px;font-weight:700"><span class="row" style="gap:10px"><span class="dot" style="background:var(--warn)"></span>${o}</span><span class="mute lt">${330 + i * 17} ms · primary</span></div>`).join("")}<div style="margin-top:18px">${agent("Guided resolution assistant")}</div></div>`, 1110, 260, 660);
+    show(res, 500);
+    [...res.querySelectorAll(".of")].forEach((r, i) => setTimeout(() => { r.querySelector(".dot").style.background = "var(--ok)"; r.querySelector(".lt").textContent = (40 + i * 2) + " ms · 4G backup"; r.querySelector(".lt").style.color = "#7FE0AE"; }, 13500 + i * 450));
+  },
+
+  // ---- carrier case and the ServiceNow record
+  vendor() {
+    D.line('<div class="eyebrow">Vendor agent</div><div class="h2" style="margin-top:8px">One carrier case, evidence attached</div>', "", 150, 110, 0);
+    const cs = el(`<div class="card" style="padding:26px 28px"><div class="row" style="gap:14px">${tile("Carrier portal", 44)}<div><div style="font-size:24px;font-weight:800">Carrier case CQ-55103</div><div class="mute" style="font-weight:600">Opened through the carrier's enterprise portal</div></div></div><div style="margin-top:18px;font-size:19px;font-weight:600;line-height:1.7"><div>Packet loss 3.4 to 4.4% on 5 circuits, onset within 6 minutes</div><div>Jitter 38 ms; traceroute shows loss after the carrier hand-off</div><div>All 5 offices on backup; circuits left up for testing</div></div><div class="row" style="margin-top:16px;gap:10px"><span class="pill" style="font-size:15px">loss-graph.png</span><span class="pill" style="font-size:15px">traceroute.txt</span><span class="pill" style="font-size:15px">circuit-ids.csv</span></div></div>`, 150, 280, 820);
+    show(cs, 200);
+    const sn = el(`<div class="card" style="padding:26px 28px"><div class="row" style="gap:14px">${tile("ServiceNow", 44)}<div><div style="font-size:24px;font-weight:800">INC0024817 · work notes</div><div class="mute" style="font-weight:600">System of record, updated by every agent</div></div></div><div id="notes" style="margin-top:14px"></div></div>`, 1030, 280, 740);
+    show(sn, 900);
+    const notes = [["07:40", "Event correlator", "Grouped 10 alerts and 4 calls into this incident"], ["07:41", "Triage orchestrator", "Root cause: carrier circuit, 95% confidence"], ["07:41", "Guided resolution assistant", "RB-003: 5 offices steered to 4G backup"], ["07:42", "Vendor agent", "Carrier case CQ-55103 raised with evidence"], ["07:42", "Mova iO", "Site contacts updated in Teams"]];
+    notes.forEach(([t, a, x], i) => setTimeout(() => { const n = document.createElement("div"); n.className = "fx"; n.style.cssText = "display:flex;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:17px"; n.innerHTML = `<span style="font-family:ui-monospace,monospace;color:var(--mute)">${t}</span><span><b>${a}</b> · ${x}</span>`; $("#notes").appendChild(n); requestAnimationFrame(() => n.classList.add("in")); }, 1500 + i * 900));
+  },
+
+  // ---- Teams update
+  comms() {
+    D.line('<div class="eyebrow">People informed</div><div class="h2" style="margin-top:8px">A plain-language update, in Teams</div>', "", 150, 110, 0);
+    const m = el(`<div class="card" style="padding:22px;background:rgba(255,255,255,.95);color:#242424"><div class="row" style="gap:12px;padding-bottom:12px;border-bottom:1px solid #E1DFDD">${tile("Microsoft Teams", 38)}<div><div style="font-weight:800;font-size:20px">IT Operations</div><div style="color:#616161;font-size:15px;font-weight:600"># Site updates</div></div></div><div class="row" style="gap:12px;margin-top:16px;align-items:flex-start"><span class="tile" style="background:linear-gradient(135deg,#EE3B33,#F7A541 50%,#E15AA5);width:40px;height:40px">M</span><div style="flex:1"><div style="font-weight:800;font-size:17px">Mova iO <span style="color:#616161;font-weight:600">to 5 site contacts · 07:42</span></div><div class="msg" style="margin-top:8px;border:1px solid #E1DFDD;padding:16px 18px"><b>Your office is back to normal speed</b><br>What happened: the carrier's network was dropping data, which slowed Teams and file access.<br>Who is on it: NOC, with the carrier (case CQ-55103).<br>What to do: nothing. We will move you back to the main line when it is stable.</div></div></div></div>`, 150, 270, 900);
+    show(m, 200);
+    const who = el(`<div class="card" style="padding:24px 26px"><div style="font-size:22px;font-weight:800;margin-bottom:10px">Delivered to</div>${["Mumbai", "Pune", "Delhi", "Indore", "Kolkata"].map((o) => `<div class="row" style="justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:19px;font-weight:700"><span>${o} site contact</span><span style="color:#7FE0AE">Read</span></div>`).join("")}</div>`, 1130, 270, 640);
+    show(who, 1400);
+  },
+
+  // ---- knowledge twin learns, failure predictor watches
+  learn() {
+    D.line('<div class="eyebrow">Knowledge twin and Failure predictor</div><div class="h2" style="margin-top:8px">Learn once, prevent next time</div>', "", 150, 110, 0);
+    const svg = el(`<svg width="900" height="600" viewBox="0 0 900 600"><defs><linearGradient id="g3" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="900" y2="600"><stop offset="0" stop-color="#F7A541"/><stop offset="1" stop-color="#E15AA5"/></linearGradient></defs>
+      ${[[450, 280, 160, 110], [450, 280, 740, 110], [450, 280, 150, 450], [450, 280, 750, 450], [450, 280, 450, 500]].map(([a, b, c, d], i) => `<line class="ln" x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="url(#g3)" stroke-width="3" stroke-dasharray="500" stroke-dashoffset="500" style="transition:stroke-dashoffset 1s ${0.4 + i * 0.5}s"/>`).join("")}
+      ${[[450, 280, "INC0024817", "#E15AA5", 88], [160, 110, "MPLS segment", "#F7A541", 74], [740, 110, "5 offices", "#F7A541", 66], [150, 450, "RB-003", "#34C27A", 66], [750, 450, "Carrier case", "#7A4A6E", 72], [450, 500, "KB article", "#FFE14D", 58]].map(([x, y, t, c, r], i) => `<g class="nd" style="opacity:0;transition:opacity .6s ${i ? 0.6 + i * 0.5 : 0}s"><circle cx="${x}" cy="${y}" r="${r}" fill="#2A1626" stroke="${c}" stroke-width="3"/><circle cx="${x}" cy="${y}" r="${r}" fill="${c}" fill-opacity=".2"/><text x="${x}" y="${y + 6}" text-anchor="middle" font-size="${i ? 16 : 19}" font-weight="800" fill="#fff">${t}</text></g>`).join("")}</svg>`, 120, 250, 900);
+    show(svg, 100); setTimeout(() => { svg.querySelectorAll(".ln").forEach((l) => l.style.strokeDashoffset = 0); svg.querySelectorAll(".nd").forEach((n) => n.style.opacity = 1); }, 300);
+    const kb = el(`<div class="card" style="padding:24px 26px"><div class="row" style="gap:12px">${tile("ServiceNow", 40)}<div style="font-size:21px;font-weight:800">KB draft · Carrier loss on a shared MPLS segment</div></div><div class="mute" style="font-size:17px;font-weight:600;margin-top:10px;line-height:1.6">Symptoms, evidence to collect, the runbook to use, and how to return to primary.</div></div>`, 1080, 270, 690);
+    show(kb, 2600);
+    const pr = el(`<div class="card" style="padding:24px 26px;border-color:rgba(255,225,77,.5)"><div class="row" style="justify-content:space-between"><div style="font-size:21px;font-weight:800">Failure predictor</div><span class="pill" style="font-size:15px">Watching</span></div><div style="font-size:19px;font-weight:600;margin-top:12px;line-height:1.6">The same early-jitter pattern on <span class="y">2 more segments</span>. Proactive watch on; steer prepared before users notice.</div><div style="margin-top:16px">${agent("Failure predictor")}</div></div>`, 1080, 470, 690);
+    show(pr, 5200);
+  }
+};
+</script></body></html>

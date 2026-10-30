@@ -11,7 +11,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, decodeURICom
   const b = await chromium.launch({ args: ['--force-device-scale-factor=1', '--disable-gpu-vsync'] });
   const pg = await b.newPage({ viewport: { width: 1920, height: 1080 } });
   const errs = []; pg.on('pageerror', (e) => errs.push(e.message)); pg.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
-  await pg.goto(`http://localhost:${PORT}/director.html?hub=${film.hub || 'hub.html'}`);
+  await pg.goto(`http://localhost:${PORT}/${film.page || 'director.html'}?hub=${film.hub || 'hub.html'}`);
   await pg.waitForFunction(() => window.D && D.ready(), null, { timeout: 30000 });
   await pg.waitForTimeout(2500);
   const cdp = await pg.context().newCDPSession(pg);

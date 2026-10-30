@@ -1,0 +1,19 @@
+{
+ "hook": "Every fibre cut. Every flapping circuit. Every alert at two in the morning.",
+ "stat1": "For more than ninety percent of mid-size and large enterprises, one hour of downtime now costs over three hundred thousand dollars.",
+ "stat2": "Thirty percent of I T service outages start in the network.",
+ "stat3": "And a third of major network outages are caused by a third-party network provider. Something your team does not control.",
+ "pivot": "This is where Mova iO comes in. A fleet of specialised agents that works across the tools you already run, with people in control.",
+ "arch": "Mova iO plugs into your estate. Signals come in from monitoring, like Ops Ramp, from your S D WAN, and from the service desk. ServiceNow stays the system of record. Agents act through the S D WAN orchestrator, carrier portals and vCenter. Key Vault guards every credential, and approvals happen in Microsoft Teams. And the agents themselves are built on Copilot Studio.",
+ "s1": "This is the I T Ops twin. Five sales offices on the same carrier slow down within minutes. Latency climbs, alerts fire, and the service desk starts taking calls.",
+ "s2": "The event correlator pulls ten alerts and four calls into one incident. Same carrier, same region, same fifteen-minute window. One ticket, not fourteen.",
+ "s3": "The triage orchestrator walks the fault path, from people to cloud. It rules out the devices, the LAN, the edge and the hub, each with evidence, and lands on the carrier circuit, with ninety-five percent confidence.",
+ "s4": "The guided resolution assistant picks a pre-approved runbook. A human stays in the loop, with ten seconds to stop it. Then the credential is checked out from Key Vault, the S D WAN orchestrator moves all five offices to their four G backup, and latency drops back to normal.",
+ "s5": "A vendor agent opens one carrier case for the whole segment, with the loss, jitter and traceroute evidence attached. And every agent writes its step back to the ServiceNow record.",
+ "s6": "Every site contact gets a plain-language update in Teams. What happened, who owns it, and what to do.",
+ "s7": "Then the knowledge twin learns. The fix becomes a knowledge article, and the failure predictor starts watching for the same pattern on other segments, before users notice.",
+ "close": "One incident instead of fourteen signals. Five offices back online in under a minute. One carrier case, with the evidence attached.",
+ "claims": "Movate reports up to forty percent lower mean time to resolve, and more than eighty percent triage accuracy, with Mova iO Operations.",
+ "tag": "Carrier outages, resolved by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}
