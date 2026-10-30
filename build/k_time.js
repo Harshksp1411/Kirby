@@ -1,0 +1,1 @@
+const Qw = Date.UTC(2026, 9, 12, 2, 10, 0), C0 = Date.UTC(2026, 9, 11, 18, 30, 0), lN = { PT: 5.5, AZ: 4, MT: 3, CT: 3, ET: 7 }, Tk = { PT: "IST", AZ: "GST", MT: "AST", CT: "EET", ET: "ICT" };

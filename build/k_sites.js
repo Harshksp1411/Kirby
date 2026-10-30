@@ -1,0 +1,27 @@
+const Dd = [["TS", "India South & East", "PT", 2, [["Hyderabad", 17.39, 78.49]]], ["UK", "India North", "PT", 1, [["Haridwar", 29.95, 78.16]]], ["DL", "India North", "PT", 1, [["Delhi", 28.61, 77.21]]], ["GJ", "India West", "PT", 2, [["Halol", 22.5, 73.47], ["Vadodara", 22.31, 73.18]]], ["MP", "India West", "PT", 1, [["Indore", 22.72, 75.86]]], ["MH", "India West", "PT", 2, [["Mumbai", 19.08, 72.88], ["Pune", 18.52, 73.86]]], ["KA", "India South & East", "PT", 1, [["Bangalore", 12.97, 77.59]]], ["WB", "India South & East", "PT", 1, [["Kolkata", 22.57, 88.36]]], ["TN", "India South & East", "PT", 2, [["Chennai", 13.08, 80.27], ["Coimbatore", 11.02, 76.96]]], ["AP", "India South & East", "PT", 1, [["Vizag", 17.69, 83.22]]], ["KW", "Middle East & Africa", "MT", 2, [["Shuaiba", 29.04, 48.13], ["Ghazali", 29.33, 47.95]]], ["AE", "Middle East & Africa", "AZ", 1, [["Ras Al Khaimah", 25.79, 55.94]]], ["SA", "Middle East & Africa", "MT", 2, [["Jeddah", 21.49, 39.19], ["Sudair", 25.68, 45.6]]], ["EG", "Middle East & Africa", "CT", 1, [["Cairo", 30.04, 31.24]]], ["VN", "Vietnam", "ET", 2, [["Ho Chi Minh City", 10.82, 106.63], ["Binh Duong", 11.05, 106.68]]]], wa = ["India North", "India West", "India South & East", "Middle East & Africa", "Vietnam"];
+Object.fromEntries(Dd.map((e11) => [e11[0], e11[1]]));
+const KIRBY_SITES = [
+ ["0248", "HYD", "Hyderabad City Office", "Hyderabad", "TS", "Global IT Hub", 390, "Jio", "100M", "Tata Tele", "Palo Alto", "09:00", "18:30", true],
+ ["0611", "SHU", "Shuaiba Plant", "Shuaiba", "KW", "Plant", 210, "KEMS", "60M", "Zain", "Huawei", "07:00", "17:00", true],
+ ["1032", "HAR", "Haridwar Plant", "Haridwar", "UK", "Plant", 190, "Tata Tele", "50M", "Airtel", "Cisco", "07:00", "19:00", true],
+ ["0117", "HAL", "Halol Plant", "Halol", "GJ", "Plant", 170, "Jio", "80M", "Airtel", "Cisco", "07:00", "19:00", true],
+ ["0389", "RAK", "RAK Plant", "Ras Al Khaimah", "AE", "Plant", 175, "Etisalat", "50M", "Etisalat", "Cisco", "07:00", "17:00", true],
+ ["0752", "JED", "Jeddah Office", "Jeddah", "SA", "Office", 96, "STC", "500M", "ITC", "Huawei", "08:00", "17:00", true],
+ ["0904", "VNF", "Vietnam Factory", "Binh Duong", "VN", "Plant", 58, "VNPT", "20M", "FPT", "Palo Alto", "07:00", "17:00", true],
+ ["0533", "SUD", "Sudair Plant", "Sudair", "SA", "Plant", 118, "STC", "50M", "STC 5G", "Meraki", "07:00", "17:00", true],
+ ["0301", "HYP", "Hyderabad Plant", "Hyderabad", "TS", "Plant", 240, "Airtel", "100M", "Tata Tele", "Cisco", "07:00", "19:00"],
+ ["0342", "VAD", "Vadodara Office", "Vadodara", "GJ", "Office", 48, "Jio", "25M", "Tata Comm", "Cisco", "09:00", "18:00"],
+ ["0415", "GHZ", "Ghazali Sales Office", "Ghazali", "KW", "Sales office", 64, "MOC", "1G", "Zain", "Cisco", "08:00", "17:00"],
+ ["0468", "VNH", "Vietnam HO", "Ho Chi Minh City", "VN", "Office", 82, "FPT", "50M", "VNPT", "Palo Alto", "08:00", "17:30"],
+ ["0526", "EGY", "Egypt Sales Office", "Cairo", "EG", "Sales office", 34, "Vodafone", "200M", "none", "Cisco", "09:00", "17:00"],
+ ["0577", "IND", "Indore Sales Office", "Indore", "MP", "Sales office", 12, "Airtel", "1M", "none", "Cisco", "09:30", "18:30"],
+ ["0614", "MUM", "Mumbai Sales Office", "Mumbai", "MH", "Sales office", 22, "Airtel", "1M", "none", "Cisco", "09:30", "18:30"],
+ ["0658", "PUN", "Pune Sales Office", "Pune", "MH", "Sales office", 14, "Airtel", "1M", "none", "Cisco", "09:30", "18:30"],
+ ["0703", "BLR", "Bangalore Sales Office", "Bangalore", "KA", "Sales office", 18, "Airtel", "2M", "none", "Cisco", "09:30", "18:30"],
+ ["0745", "DEL", "Delhi Sales Office", "Delhi", "DL", "Sales office", 20, "Airtel", "1M", "none", "Cisco", "09:30", "18:30"],
+ ["0788", "KOL", "Kolkata Sales Office", "Kolkata", "WB", "Sales office", 12, "Airtel", "1M", "none", "Cisco", "09:30", "18:30"],
+ ["0826", "CHE", "Chennai Sales Office", "Chennai", "TN", "Sales office", 16, "Airtel", "1M", "none", "Cisco", "09:30", "18:30"],
+ ["0869", "CBE", "Coimbatore Sales Office", "Coimbatore", "TN", "Sales office", 9, "Airtel", "1M", "none", "Cisco", "09:30", "18:30"],
+ ["0912", "VIZ", "Vizag Sales Office", "Vizag", "AP", "Sales office", 9, "Tata Tele", "2M", "none", "Cisco", "09:30", "18:30"]
+];
+const EO = ["Plant", "Office", "Works", "Campus", "Yard", "Depot"], VU = KIRBY_SITES.filter((s) => s[13]).map((s) => [s[0], s[3], s[2], s[4], "Kirby"]), IO = [{ id: "DC2", name: "Global IT Hub", sub: "Hyderabad \xB7 NOC, SOC and Service Desk", lat: 17.2, lng: 78.9, kind: "dc" }, { id: "DC1", name: "Kuwait DC", sub: "Regional data center \xB7 Shuaiba and Ghazali", lat: 29.6, lng: 47.4, kind: "dc" }, { id: "HSC", name: "Azure landing zone", sub: "Azure Central India \xB7 native services", lat: 19.6, lng: 74.6, kind: "site" }, { id: "NSC", name: "Microsoft 365", sub: "Entra ID, Exchange Online, Teams", lat: 21.0, lng: 71.0, kind: "site" }, { id: "DSC", name: "UAE internet breakout", sub: "Etisalat \xB7 Dubai", lat: 24.4, lng: 54.4, kind: "site" }, { id: "AWS-USW2", name: "AWS Mumbai", sub: "ap-south-1 \xB7 300+ resources", lat: 19.9, lng: 72.4, kind: "cloud" }, { id: "AWS-USE1", name: "AWS Singapore", sub: "ap-southeast-1 \xB7 backup copies", lat: 3.0, lng: 101.8, kind: "cloud" }, { id: "EPIC-VER", name: "AVS primary \xB7 SAP", sub: "Azure VMware Solution \xB7 AV64 cluster \xB7 SAP ERP, BW, Portal", lat: 18.2, lng: 73.4, kind: "epic" }, { id: "EPIC-ROC", name: "AVS DR \xB7 JetStream", sub: "Azure VMware Solution DR \xB7 South India", lat: 12.6, lng: 80.0, kind: "epic" }];
