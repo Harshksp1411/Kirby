@@ -197,6 +197,7 @@ rep_exact('Stethoscope: t_', 'Stethoscope: Pz')
 
 # drill-down from anywhere
 s += '\n' + rd('k_drill.js') + '\n'
+s += '\n' + rd('k_cc.js') + '\n'
 
 open(P('app.k0.js'), 'w').write(s)
 print('ok', len(s))
