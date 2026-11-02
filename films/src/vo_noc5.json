@@ -1,0 +1,14 @@
+{
+ "hook": "The nightly backup fails. Nobody reads the email. Until the day you need a restore.",
+ "stat": "In their latest large-scale test, organisations could recover only fifty eight percent of their servers within expectations.",
+ "intro": "Here is how Mova iO makes sure last night's backup really happened.",
+ "s1": "At two in the morning, the plant database job in Veeam fails on two of its six servers. The next scheduled run is a full day away.",
+ "s2": "Mova iO opens an incident before anyone logs in. The last good restore point is twenty six hours old, so the twenty four hour recovery target is already missed.",
+ "s3": "The agent reads the session log, then checks the servers through Ops Ramp. On both, the SQL Server V S S writer is stuck in a failed state, so Veeam could not take a consistent snapshot.",
+ "s4": "Restarting the writer is a standard, low-risk runbook. The agent restarts the service, confirms the writer is stable, and retries the job for just the two failed servers.",
+ "s5": "The retry succeeds. A test restore of each database is mounted and checked, so the team knows the backup is usable, not just present.",
+ "s6": "The backup team gets a summary in Teams, and the incident closes with the cause, the fix, and the new restore points.",
+ "close": "A failed backup caught overnight. Fixed and retried before the shift began. Every restore point tested.",
+ "tag": "Backups you can trust, with Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

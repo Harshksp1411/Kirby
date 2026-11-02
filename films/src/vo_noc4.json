@@ -1,0 +1,15 @@
+{
+ "hook": "The lights go out at a sales office. The network runs on battery. The clock starts.",
+ "stat": "Power is still the leading cause of impactful outages.",
+ "intro": "Here is how Mova iO keeps a site running through a power cut.",
+ "s1": "Ops Ramp sees the U P S at the Vadodara office switch to battery. Input voltage drops to zero, and the switch and the edge router report the same.",
+ "s2": "On the U P S itself, the numbers are clear. Forty six percent load, thirty eight minutes of runtime. Mova iO checks the utility's outage notice: power is not due back for two hours.",
+ "s3": "The triage agent writes the plan into the incident. Shed the load that can wait, dispatch an engineer, and tell the people in the office.",
+ "s4": "Switching off cameras and meeting room access points needs a person to agree. The site lead approves in Teams, and runtime nearly doubles, to seventy one minutes.",
+ "s5": "In ServiceNow Field Service, a work order goes to the nearest engineer, with the site, the U P S, and the shutdown plan attached.",
+ "s6": "Everyone in the office gets a short message: what happened, how long the network will last, and what to do.",
+ "s7": "When the grid comes back, the U P S goes back online, the ports come back up on their own, and the incident closes with the full timeline.",
+ "close": "A power cut handled in minutes. Runtime almost doubled. Staff told before they had to ask.",
+ "tag": "Site outages, handled by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

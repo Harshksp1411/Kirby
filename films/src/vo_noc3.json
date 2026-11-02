@@ -1,0 +1,14 @@
+{
+ "hook": "The disk fills at midnight. The night batch fails. Nobody saw it coming.",
+ "stat": "For more than ninety percent of mid-size and large enterprises, one hour of downtime costs over three hundred thousand dollars.",
+ "intro": "Here is how Mova iO stops an outage before it starts.",
+ "s1": "Ops Ramp watches the database server at the Rakhial plant. Its data drive is at ninety one percent, and the forecast says it will be full by eleven forty tonight, right in the middle of the night batch.",
+ "s2": "Mova iO opens a proactive incident and works out why. A disk analysis on the server shows the transaction log has grown by sixty gigabytes since Tuesday, because the log backup job has been failing since then.",
+ "s3": "The fix matches a standard change the change board has already approved. Mova iO raises it in ServiceNow, runs the pre-checks, and confirms last night's full backup before touching anything.",
+ "s4": "It points the backup job at the right share, runs a log backup, and shrinks the log. One hundred and eighty gigabytes come back, and the forecast line disappears.",
+ "s5": "The database team is told in Teams, with the cause and the fix, and is asked to confirm.",
+ "s6": "Change and incident close together, with the notes written for them. No outage, no night call.",
+ "close": "A full disk predicted nine hours early. Fixed through a pre-approved change. No outage, and no one woken up.",
+ "tag": "Outages prevented by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

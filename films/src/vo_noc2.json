@@ -1,0 +1,15 @@
+{
+ "hook": "A plant server stops answering. Print jobs pile up. The line waits.",
+ "stat": "I T and network issues caused nearly a quarter of all impactful outages last year.",
+ "intro": "Here is how Mova iO brings a frozen server back, before the plant floor notices.",
+ "s1": "Ops Ramp sees it first. The application server at the Haridwar plant stops answering pings, its VMware Tools heartbeat goes quiet, and the file and print checks fail.",
+ "s2": "Mova iO groups six alerts and two calls from the plant into one inference, and opens a single incident in ServiceNow.",
+ "s3": "The triage agent checks every layer through vCenter. The host is healthy, storage has room, the network is fine. Only the guest operating system is stuck, pinned at one hundred percent C P U.",
+ "s4": "Restarting a production server during a shift needs a person. The plant I T lead gets the facts in Teams, and approves with one tap.",
+ "s5": "In vCenter, the agent takes a snapshot first, tries a clean restart, and when the guest does not respond, resets the virtual machine. Every task is logged against the incident.",
+ "s6": "Two minutes later the server is back. Tools are running, file and print checks pass, and Ops Ramp clears the alerts on its own.",
+ "s7": "The incident closes with full notes, the plant is told in Teams, and because this is the third hang this month, a problem record is opened to find the cause.",
+ "close": "One incident instead of eight signals. A frozen server back in under five minutes. A problem record so it does not happen again.",
+ "tag": "Server outages, resolved by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}
