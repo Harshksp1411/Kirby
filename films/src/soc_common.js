@@ -1,0 +1,14 @@
+// Shared bits for the security films: Defender / Entra / Intune / Purview navigation and an incident graph builder.
+exports.defNav = ["Home", "Exposure management", "#Investigation & response", "Incidents & alerts", ">Incidents", ">Alerts", "Hunting", "Actions & submissions", ">Action center", ">Submissions", "Threat intelligence", "#Assets", "Devices", "Identities", "#Email & collaboration", "Explorer", "Review", "Policies & rules", "#Cloud apps"];
+exports.entraNav = ["Home", "Favorites", "#Identity", "Overview", "Users", ">All users", ">Deleted users", "Groups", "Devices", "Applications", "Protection", ">Identity Protection", ">>Risky users", ">>Risky sign-ins", ">Conditional Access", "Monitoring & health", ">Sign-in logs", ">Audit logs"];
+exports.intuneNav = ["Home", "Dashboard", "All services", "Devices", ">Overview", ">All devices", ">Windows", ">Monitor", "Apps", "Endpoint security", ">Security baselines", ">Antivirus", "Reports", "Users", "Groups", "Tenant administration"];
+exports.purviewNav = ["Home", "Solutions", "#Data loss prevention", "Overview", "Policies", "Alerts", "Activity explorer", "#Insider risk management", "Cases", "#Information protection", "Sensitivity labels", "#Audit"];
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+// nodes: [id, x, y, label, sub, color, glyph]; edges: [a, b, label]
+exports.graph = (nodes, edges, w = 760, h = 360) => {
+  const N = Object.fromEntries(nodes.map((n) => [n[0], n]));
+  const e = edges.map(([a, b, l]) => { const A = N[a], B = N[b]; const mx = (A[1] + B[1]) / 2, my = (A[2] + B[2]) / 2; return `<line x1="${A[1]}" y1="${A[2]}" x2="${B[1]}" y2="${B[2]}" stroke="#B3B0AD" stroke-width="1.6"/>${l ? `<rect x="${mx - 4 - l.length * 3.1}" y="${my - 10}" width="${8 + l.length * 6.2}" height="18" rx="9" fill="#fff" stroke="#E1DFDD"/><text x="${mx}" y="${my + 3}" font-size="11" fill="#605E5C" text-anchor="middle">${esc(l)}</text>` : ""}`; }).join("");
+  const n = nodes.map(([id, x, y, l, s, c, g]) => `<g id="gn-${id}"><circle cx="${x}" cy="${y}" r="24" fill="#fff" stroke="${c}" stroke-width="2.5"/><text x="${x}" y="${y + 5}" font-size="14" font-weight="700" fill="${c}" text-anchor="middle">${g}</text><text x="${x}" y="${y + 42}" font-size="12.5" font-weight="600" fill="#242424" text-anchor="middle">${esc(l)}</text><text x="${x}" y="${y + 57}" font-size="11.5" fill="#605E5C" text-anchor="middle">${esc(s || "")}</text></g>`).join("");
+  return `<svg viewBox="-10 0 ${w + 20} ${h}" style="display:block;margin:0 auto;width:100%;height:auto;max-height:${h}px">${e}${n}</svg>`;
+};
+exports.sevPill = (s) => { const c = { High: "#C50F1F", Medium: "#BC4B09", Low: "#8A8886", Informational: "#605E5C" }[s] || "#605E5C"; return `<span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;color:${c}"><i style="width:8px;height:8px;border-radius:50%;background:${c};display:inline-block"></i>${s}</span>`; };

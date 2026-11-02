@@ -1,0 +1,14 @@
+{
+ "hook": "One convincing email. Twenty three inboxes. It only takes one click.",
+ "stat": "About sixty percent of confirmed breaches involve a human action, like clicking a link.",
+ "intro": "Here is how Mova iO handles a phishing report, from first click to clean inboxes.",
+ "s1": "It starts with a careful employee. Kavya in finance gets an invoice email from a domain that looks almost right, and reports it from Outlook.",
+ "s2": "In Microsoft Defender, Mova iO's triage agent picks up the report. The domain was registered two days ago, the link leads to a fake sign-in page, and the same message reached twenty three people. Verdict: malicious.",
+ "s3": "In Threat Explorer, it finds every copy of the email and sees that two people clicked the link.",
+ "s4": "Removing mail from twenty three inboxes is a big action, so the S O C lead approves it in Teams first.",
+ "s5": "Defender soft-deletes every copy, blocks the sender and the U R L, and the agent checks the two people who clicked. No sign-ins from new places, but their sessions are reset as a precaution.",
+ "s6": "Kavya gets a thank-you and a plain explanation, and the security incident in ServiceNow closes with the full evidence.",
+ "close": "One report from one person. Every copy gone in minutes. The two people who clicked, protected.",
+ "tag": "Phishing, contained by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

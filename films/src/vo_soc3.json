@@ -1,0 +1,14 @@
+{
+ "hook": "A macro in an invoice. A laptop starts encrypting files. Every second counts.",
+ "stat": "Ransomware was present in forty four percent of breaches in the latest Verizon report.",
+ "intro": "Here is how Mova iO stops ransomware on one laptop, before it reaches the file shares.",
+ "s1": "Microsoft Defender raises a high severity alert on a finance laptop. A Word document launched PowerShell, files in Documents are being renamed, and the device is reaching for a file share.",
+ "s2": "Mova iO's triage agent reads the process tree and the timeline. Verdict: ransomware, ninety eight percent. For this pattern, the playbook says isolate first, then tell people.",
+ "s3": "So the agent isolates the device straight away, while Teams and Outlook stay reachable. The SOC lead gets a notice in Teams, with a one-click release if it was wrong.",
+ "s4": "Then it cleans up. A full scan runs, the malicious files are quarantined, and an investigation package is collected for the record.",
+ "s5": "Next, it hunts across every device for the same file hash and the same macro. Nothing else is affected.",
+ "s6": "In Intune, a fresh start is queued for the laptop, the user gets a loaner through ServiceNow, and the security incident closes with full evidence.",
+ "close": "Ransomware stopped on one laptop. Isolated in under a minute. The rest of the estate checked and clean.",
+ "tag": "Endpoint threats, stopped by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

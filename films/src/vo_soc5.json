@@ -1,0 +1,13 @@
+{
+ "hook": "Twelve hundred files in twenty five minutes. A personal cloud drive. A resignation letter three days old.",
+ "stat": "The average data breach now costs four point four four million dollars.",
+ "intro": "Here is how Mova iO handles a possible data theft, quickly and fairly.",
+ "s1": "Microsoft Purview raises a high severity data loss prevention alert. An engineer at the Halol plant downloaded over twelve hundred files from the plant engineering site, then tried to upload confidential drawings to a personal Google Drive. Endpoint D L P blocked the uploads.",
+ "s2": "Mova iO's triage agent builds the timeline in Activity explorer. Eighty six files are labelled confidential. Insider risk management shows a resignation recorded three days ago through the H R connector.",
+ "s3": "This is about a person, so the agent does not decide alone. It recommends restricting downloads and opening an insider risk case, and asks H R and the security lead to approve in Teams.",
+ "s4": "Both approve. Downloads from SharePoint are restricted for this user only, and a case is opened in Purview with the evidence attached and a legal hold on the mailbox and OneDrive.",
+ "s5": "The ServiceNow security incident is handed to H R and legal with a clear summary, and the user's manager is briefed. No accusations, just facts.",
+ "close": "A possible data theft spotted in minutes. Uploads blocked, evidence preserved. People decide what happens next.",
+ "tag": "Data protection, powered by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

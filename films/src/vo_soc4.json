@@ -1,0 +1,14 @@
+{
+ "hook": "A critical flaw is published at night. Attackers are already using it. How many of your devices have it?",
+ "stat": "Exploited vulnerabilities were the way in for twenty percent of breaches, up thirty four percent in a year.",
+ "intro": "Here is how Mova iO finds and patches a critical vulnerability across the estate, in a day instead of a month.",
+ "s1": "In Defender Vulnerability Management, a new critical weakness appears in the browser on twelve hundred and eighty four devices. Mova iO checks the threat feeds: it is on the known exploited list, and attacks are active.",
+ "s2": "The agent works out the plan. The fix is a browser update, already tested by the vendor. It raises an expedited change in ServiceNow, with a pilot ring first and everyone else a few hours later.",
+ "s3": "The change manager approves in Teams, with the exposure, the plan, and the rollback in one card.",
+ "s4": "In Intune, the update goes to the pilot ring of sixty four devices. Sixty two install cleanly, and the two failures are on machines that were switched off. The broad ring follows.",
+ "s5": "By the evening, Defender shows the exposure down from twelve hundred and eighty four devices to thirty seven, all offline laptops. Each one gets a follow-up task, and is forced to update before it can reach company apps.",
+ "s6": "The change closes in ServiceNow with the evidence, and the security team gets a one page summary.",
+ "close": "A critical flaw found in minutes. Ninety seven percent patched in one day. The rest blocked until they update.",
+ "tag": "Vulnerabilities, closed by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

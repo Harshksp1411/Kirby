@@ -1,0 +1,14 @@
+{
+ "hook": "Same user. Two countries. Eighteen minutes apart.",
+ "stat": "Identity-based attacks rose thirty two percent in the first half of twenty twenty five.",
+ "intro": "Here is how Mova iO handles a stolen sign-in, before the attacker gets far.",
+ "s1": "Entra I D Protection flags Arjun, a plant manager, as high risk. He signed in from Mumbai at nine, and again from Amsterdam eighteen minutes later, through an anonymous proxy, with a valid session token.",
+ "s2": "In Microsoft Defender, the triage agent pulls the story together. The token was stolen through a fake sign-in page. Within minutes, the attacker created an inbox rule to hide replies about invoices. No email has been sent yet.",
+ "s3": "The agent recommends revoking every session, forcing a password reset, and removing the rule. It leaves the account enabled so Arjun can keep working. The SOC lead approves in Teams.",
+ "s4": "In Entra, sessions are revoked and the user is confirmed compromised, which triggers a secure password reset at his next sign-in. In Defender, the inbox rule is removed and the proxy address is blocked.",
+ "s5": "Arjun gets a clear message in Teams: what happened, what was done, and how to sign in again.",
+ "s6": "The security incident closes in ServiceNow with the full timeline, and the fake sign-in page is reported for takedown.",
+ "close": "A stolen session caught in minutes. The attacker locked out. The user back at work the same morning.",
+ "tag": "Identity threats, contained by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}
