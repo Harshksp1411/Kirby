@@ -11,5 +11,6 @@ s=s.replace('''    $(".cs .hd span:nth-child(3)", W()).textContent = c.agent;
 s=s.replace('"Mova iO": "#E15AA5" };','"Mova iO": "#E15AA5", vCenter: "#0079B8", "Microsoft Defender": "#0F6CBD", "Defender for Office 365": "#0F6CBD", "Defender for Endpoint": "#0F6CBD", "Defender Vulnerability Mgmt": "#0F6CBD", "Microsoft Sentinel": "#0078D4", "Entra ID": "#0F6CBD", Intune: "#0F6CBD", Purview: "#038387", Veeam: "#00B336", Outlook: "#0F6CBD", "Exchange Online": "#0F6CBD", "Field Service": "#2F5B4F", "Virtual Agent": "#2F5B4F", "Email": "#0F6CBD" };',1)
 s=s.replace('$("#snnotes", W()).prepend(n); $("#snupd", W()).textContent = "just now";','$("#snnotes", W()).prepend(n); const u = $("#snupd", W()); if (u) u.textContent = "just now";')
 s=s.replace('el.textContent = pre + Math.round(to * e) + suf;','el.textContent = pre + (Number.isInteger(to) ? Math.round(to * e) : (to * e).toFixed(2)) + suf;')
+s=s.replace('local(el) { const r = el.getBoundingClientRect(); return { x: (r.x - cam.tx) / cam.k, y: (r.y - cam.ty) / cam.k, w: r.width / cam.k, h: r.height / cam.k }; },','local(el) { const r = el.getBoundingClientRect(), w = W().getBoundingClientRect(), s = w.width / 1640; return { x: 140 + (r.x - w.x) / s, y: 84 + (r.y - w.y) / s, w: r.width / s, h: r.height / s }; },')
 open('kit.html','w').write(s)
 print('ok', len(s))

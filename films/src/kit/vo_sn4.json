@@ -1,0 +1,13 @@
+{
+ "hook": "Forty-six work notes. Three teams. Three days. And nobody wants to read it all.",
+ "intro": "Here is how Mova iO summarizes a ticket, so the next person starts where the last one stopped.",
+ "s1": "Meera has just picked up this incident. Teams calls keep dropping in the Pune office. It's been open three days, bounced between three teams, and the activity stream is a wall of notes.",
+ "s2": "One click on Summarize, and Mova iO reads all of it: the issue, what's been tried, the likely cause, the next step, and who's still waiting. Five lines instead of forty-six notes.",
+ "s3": "She shares the summary to the work notes, so everyone is on the same page, and sends the twelve callers a plain-language update, drafted for her, that she checks before posting.",
+ "s4": "Once the fix is in, the resolution notes are drafted from the activity: cause, fix, how it was verified, and the follow-up. The twelve linked tickets close with the same note.",
+ "s5": "A knowledge article is drafted too, written for the next engineer, and sent to the network team for review.",
+ "s6": "And at shift change, the handover is already written: every open priority one and two, in a line each.",
+ "close": "Three days of notes, caught up in one click. Callers updated in plain language. Resolution notes, a knowledge draft, and the handover, written for you.",
+ "tag": "Ticket summaries, written by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

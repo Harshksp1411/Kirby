@@ -1,0 +1,14 @@
+{
+ "hook": "Backups fail quietly. Nobody notices. Until the day you need to restore.",
+ "stat1": "In ninety-six percent of ransomware attacks, the backup repositories were targeted too.",
+ "stat2": "And on average, forty-three percent of the affected data was never recovered.",
+ "intro": "Here is how Mova iO fixes a failed backup, before anyone is awake.",
+ "s1": "Two thirty-one in the morning. In Veeam, the nightly backup for a plant file server fails. The guest wouldn't freeze for a consistent snapshot, and three retries didn't help.",
+ "s2": "Mova iO opens an incident in ServiceNow, and the triage orchestrator finds the real cause: a S Q L writer left in a failed state after a Windows update restarted the database. The repository, the proxy, and the network are all fine.",
+ "s3": "The fix is a pre-approved runbook. In Copilot Studio, every step is a tool call you can inspect: the session log, the writer check, the Key Vault secret, the writer reset, the retry, and the restore-point verification.",
+ "s4": "Back in Veeam, the retry succeeds. And Sure Backup boots the new restore point in an isolated lab to prove it actually works.",
+ "s5": "By three thirteen, the incident is resolved with full notes. At six, the backup owner gets a one-line summary in Teams, plus a change to stop it happening after the next patch.",
+ "close": "Failed at two thirty-one. Fixed and verified by three thirteen. The restore point proven, not assumed.",
+ "tag": "Failed backups, fixed by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

@@ -1,0 +1,17 @@
+{
+ "hook": "A plant line stops. A server stops answering. And every minute, production waits.",
+ "stat1": "Fifty-seven percent of operators said their most recent major outage cost more than a hundred thousand dollars.",
+ "stat2": "And one in five said it cost more than a million.",
+ "intro": "Here is how Mova iO brings a hung server back, before the shift notices.",
+ "s1": "Seven thirty-eight. In Ops Ramp, the M E S application server for line two stops answering. The app check fails, the agent heartbeat is lost, and ping drops to zero.",
+ "s2": "Mova iO's event correlator groups five alerts and two calls from the plant into one inference, flags the root-cause alert, and opens one incident in ServiceNow.",
+ "s3": "The triage orchestrator checks v Center. The host is healthy, the storage is fine, and other servers on the same network respond. But this V M has been pinned at a hundred percent C P U, with memory at ninety-eight, and VMware Tools has stopped.",
+ "s4": "So the incident arrives already diagnosed: a guest O S hang, at ninety-two percent confidence, with everything it ruled out, and a recommended runbook.",
+ "s5": "Because this is a production system, Plant I T approves the fix in Microsoft Teams: take a memory snapshot first, then reset the V M.",
+ "s6": "In Copilot Studio, every step is a tool call you can inspect: the V M health check, the runbook search, the approval, the Key Vault secret, the snapshot, and the reset, with exact inputs and outputs.",
+ "s7": "In v Center, the snapshot completes, and the reset follows. VMware Tools is running again, C P U settles at eighteen percent, and the application check comes back green.",
+ "s8": "The plant channel gets a plain update. In ServiceNow, the incident is resolved, and because this is the third hang this month, a problem record is raised, with the memory dump attached for the vendor.",
+ "close": "Hang diagnosed in under two minutes. Line two back six minutes after the first alert. Evidence kept, and a problem raised, so it doesn't come back.",
+ "tag": "Hung servers, recovered by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

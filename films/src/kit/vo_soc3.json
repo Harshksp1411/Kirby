@@ -1,0 +1,15 @@
+{
+ "hook": "A macro runs. Shadow copies vanish. And files start changing their names.",
+ "stat1": "Ransomware was present in forty-four percent of breaches, up from thirty-two percent a year earlier.",
+ "intro": "Here is how Mova iO stops ransomware on one laptop, before it reaches the next.",
+ "s1": "Nine twelve. Defender for Endpoint fires on a Pune laptop. A Word macro launched PowerShell, which downloaded a payload, deleted the shadow copies, and started renaming files on the project share.",
+ "s2": "Ransomware is pre-approved for instant containment. Mova iO isolates the device twenty-four seconds after the first alert, keeping only Teams open, then quarantines the payload and cuts its session to the file server.",
+ "s3": "The attack story shows the whole chain. The agent hunts for the same file everywhere else and finds nothing, purges the same email from three other mailboxes, and blocks the hash across the company.",
+ "s4": "Recovery changes data, so the S O C approves it in Teams: restore the damaged files, and wipe and rebuild the laptop.",
+ "s5": "In Copilot Studio, every step is a tool call you can inspect: the isolation, the quarantine, the hunt, the purge, the block, the approval, the restore, and the rebuild.",
+ "s6": "In Veeam, the eight o'clock restore point is scanned clean, and all two hundred and fourteen files come back.",
+ "s7": "Defender's action center shows every action and who decided it. And the engineering team gets a plain note: what happened, what was restored, and the one thing to check.",
+ "close": "Isolated twenty-four seconds after the first alert. No spread, and the payload blocked everywhere. Every file back from a clean copy in minutes.",
+ "tag": "Ransomware, stopped by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

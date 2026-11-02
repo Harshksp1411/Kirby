@@ -1,0 +1,16 @@
+{
+ "hook": "The lights go out. The U P S takes over. And the clock starts ticking.",
+ "stat1": "Power is still the leading cause of outages that hurt the business.",
+ "intro": "Here is how Mova iO keeps a site running through a power cut.",
+ "s1": "Nine forty-one. In Ops Ramp, the Vadodara office loses utility power. The U P S goes on battery, and the generator switch reports that it hasn't transferred. Mova iO groups it all into one inference.",
+ "s2": "On the U P S management card, the battery is at ninety-two percent, carrying sixty-one percent load. That leaves thirty-eight minutes.",
+ "s3": "The agent checks the utility's outage page. It's a cable fault, with power expected back in about two hours. So the battery will not last, and the generator has to run.",
+ "s4": "A priority one incident opens in ServiceNow with the plan already in it: shed non-critical load to buy time, get the generator started by hand, and send an engineer to fix the switch.",
+ "s5": "Facilities has already been called. Site I T approves the load shedding in Teams, keeping the domain controller, the file server and C C T V running.",
+ "s6": "In v Center, five non-critical machines shut down cleanly: print, test, two V D I hosts, and the update server.",
+ "s7": "The load drops to thirty-four percent, and the runtime nearly doubles, to seventy-one minutes. At ten oh two, Facilities starts the generator, and the U P S goes back on line.",
+ "s8": "In Field Service, the nearest engineer with the right skills and parts is already on the way. And the site updates channel gets a plain-language status, with what's off and when power should be back.",
+ "close": "Battery stretched from thirty-eight to seventy-one minutes. Generator running twenty-one minutes after the cut. No servers dropped, and the engineer already on the way.",
+ "tag": "Power cuts, handled by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

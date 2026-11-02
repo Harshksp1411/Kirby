@@ -1,0 +1,15 @@
+{
+ "hook": "A zero-day is announced. Attackers already have it. And fourteen hundred of your devices are exposed.",
+ "stat1": "Twenty percent of breaches began with an exploited vulnerability, up thirty-four percent in a year.",
+ "stat2": "And fixing vulnerable edge devices took a median of thirty-two days.",
+ "intro": "Here is how Mova iO closes an exploited vulnerability in hours, not weeks.",
+ "s1": "In Defender Vulnerability Management, a new Chrome weakness appears, marked as exploited in the wild, with one thousand four hundred and twelve of our devices exposed, including thirty-eight jump servers.",
+ "s2": "Mova iO's vulnerability agent opens it in ServiceNow Vulnerability Response, scores it critical, and writes the plan: rings, deadlines, exceptions, and rollback. It has already tested the new version against twelve critical web apps.",
+ "s3": "Because this is an expedited change, the change manager approves the rollout in Teams.",
+ "s4": "In Copilot Studio, every step is a tool call you can inspect: the exposure query, the threat intel check, the test run, the change, the approval, and the Intune assignment by ring.",
+ "s5": "In Intune, the update goes out ring by ring: I T first, then the pilot, then everyone, with the jump servers in tonight's window. Devices waiting on a reboot are retried, and the offline ones are chased with their owners.",
+ "s6": "Back in Defender, exposure drops from fourteen hundred and twelve devices to thirty-one, and every one of those is tracked to an owner in ServiceNow.",
+ "close": "Prioritised, tested and approved in twenty-five minutes. Thirteen hundred and eighty-one devices patched in under a day. The last thirty-one tracked, not forgotten.",
+ "tag": "Exploited vulnerabilities, closed by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

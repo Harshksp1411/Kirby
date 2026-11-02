@@ -1,0 +1,14 @@
+{
+ "hook": "Outlook not working. That's the whole ticket. Now someone has to work out the rest.",
+ "stat": "Mova iO triage reaches over eighty percent accuracy in live operations.",
+ "intro": "Here is how Mova iO triages every ticket in ServiceNow, and shows its reasons.",
+ "s1": "A ticket arrives from the portal with three words. No category, no configuration item, no priority. On a busy morning, it would sit in the queue.",
+ "s2": "The triage agent reads it straight away. It checks Sana's laptop in Intune, and sees that Microsoft three six five apps updated overnight. It finds seventeen similar tickets from two offices in the last two hours.",
+ "s3": "It fills in category, subcategory, configuration item and urgency, each with its confidence and the reason behind it.",
+ "s4": "Impact is less certain, so it asks a person. The service desk analyst sees the evidence, eighteen users across two sites, and confirms. Priority moves to two.",
+ "s5": "The agent groups all eighteen tickets under one parent incident, attaches the known workaround, and tells the end user computing lead in Teams that the update ring may need pausing.",
+ "s6": "Across the day, the triage dashboard shows how it is going: most tickets accepted as triaged, and every low-confidence field checked by a person.",
+ "close": "Every ticket triaged on arrival. Reasons shown for every field. People decide when it's not clear.",
+ "tag": "Ticket triage, done by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

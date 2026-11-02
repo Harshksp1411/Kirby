@@ -1,0 +1,14 @@
+{
+ "hook": "Wrong team. Reassigned. Wrong team again. Meanwhile, someone is still waiting.",
+ "stat": "Every time a ticket is reassigned, the employee loses about forty more minutes.",
+ "intro": "Here is how Mova iO routes every ticket in ServiceNow to the right team and the right person, first time.",
+ "s1": "The service desk queue fills up at nine. Each ticket is triaged, but nobody has picked them up yet.",
+ "s2": "Take this one: the meeting rooms in Pune cannot start calls. A keyword rule would send it to the network team. The routing agent checks the configuration item, the support group in the C M D B, and who fixed similar tickets last month. It picks Collaboration, meeting rooms.",
+ "s3": "Then it picks the person. Who is on shift, who has the skill, who is in Pune today, and who has the lightest queue. Priya is the best fit, and the reasons are written down.",
+ "s4": "Priya gets the ticket in Teams with a short summary, and accepts it in one tap.",
+ "s5": "The agent also watches tickets that people route by hand. This SharePoint access ticket went to Network Operations, but it is a permissions problem. The queue manager agrees, and it moves before it bounces.",
+ "s6": "Over the month, reassignments fall from thirty one percent to nine, and the time to assign drops to seconds.",
+ "close": "The right team, the right person, first time. Reasons recorded for every choice. Fewer bounces, faster fixes.",
+ "tag": "Ticket routing, done by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

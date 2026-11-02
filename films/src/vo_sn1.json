@@ -1,0 +1,13 @@
+{
+ "hook": "Who are you? Which device? When did it start? The same questions, on every call.",
+ "intro": "Here is how Mova iO creates complete tickets in ServiceNow, from any channel, without the twenty questions.",
+ "s1": "Neha is working from home, and her V P N keeps dropping. She tells the I T help agent in Teams, in her own words.",
+ "s2": "The agent already knows who she is and which laptop she uses, from Entra and Intune. It asks just one question, and pulls the V P N logs from her laptop in the background.",
+ "s3": "Seconds later, the incident exists in ServiceNow. Caller, device, category, impact, a clean short description, and a summary of the chat, all filled in. The logs are attached.",
+ "s4": "The same works for email. A message to the service desk about a jammed printer becomes a ticket, and because the printer already has an open incident, it is linked instead of duplicated.",
+ "s5": "And voice: a voicemail is transcribed and turned into a ticket. In the queue, every new ticket arrives complete, whatever the channel.",
+ "s6": "Neha gets her ticket number in Teams with a fix to try now, and she never had to fill in a form.",
+ "close": "Tickets created in seconds, from chat, email and voice. Every field filled in. Duplicates linked, not logged twice.",
+ "tag": "Ticket creation, handled by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

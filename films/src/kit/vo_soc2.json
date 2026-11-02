@@ -1,0 +1,14 @@
+{
+ "hook": "Right password. Approved M F A. Wrong person.",
+ "stat1": "Twenty-two percent of breaches started with stolen or abused credentials. It's now the most common way in.",
+ "intro": "Here is how Mova iO catches a stolen session, and asks the person who would know.",
+ "s1": "Eleven twenty-two. Entra I D Protection flags a high-risk sign-in for Vikram, from an anonymizing V P N in Amsterdam, forty-one minutes after he signed in from Pune. And the M F A request was approved on his phone.",
+ "s2": "In Microsoft Defender, it becomes an incident. Four minutes after the sign-in, a hidden inbox rule started forwarding anything about invoices or payments to an outside address. The S O C agent writes up what it sees, and what it plans to do.",
+ "s3": "Instead of guessing, Mova iO asks Vikram in Teams: was this you? It wasn't. He'd tapped approve on a random M F A prompt during a meeting.",
+ "s4": "Because the user has confirmed it, containment is pre-approved. The S O C still gets the details, with ten seconds to stop it.",
+ "s5": "In Copilot Studio, every step is a tool call you can inspect: the sign-in details, the mailbox audit, the user's answer, the session revoke, the inbox rule removal, the I P block, and the ticket.",
+ "s6": "Back in Defender, the rule is gone, every alert is resolved, and the attacker's next attempt is blocked. Vikram resets his password and switches to number matching, and Finance gets a list of the three emails that were forwarded.",
+ "close": "Detected at eleven twenty-two. Contained by eleven twenty-eight. Confirmed by the person who would know.",
+ "tag": "Account takeovers, stopped by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

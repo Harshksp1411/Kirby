@@ -1,0 +1,362 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>apps</title>
+<style>
+@font-face{font-family:Mr;font-weight:600;src:url(node_modules/@fontsource/manrope/files/manrope-latin-600-normal.woff2)}
+@font-face{font-family:Mr;font-weight:700;src:url(node_modules/@fontsource/manrope/files/manrope-latin-700-normal.woff2)}
+@font-face{font-family:Mr;font-weight:800;src:url(node_modules/@fontsource/manrope/files/manrope-latin-800-normal.woff2)}
+@font-face{font-family:Lato;font-weight:400;src:url(node_modules/@fontsource/lato/files/lato-latin-400-normal.woff2)}
+@font-face{font-family:Lato;font-weight:700;src:url(node_modules/@fontsource/lato/files/lato-latin-700-normal.woff2)}
+@font-face{font-family:OS;font-weight:400;src:url(node_modules/@fontsource/open-sans/files/open-sans-latin-400-normal.woff2)}
+@font-face{font-family:OS;font-weight:600;src:url(node_modules/@fontsource/open-sans/files/open-sans-latin-600-normal.woff2)}
+@font-face{font-family:OS;font-weight:700;src:url(node_modules/@fontsource/open-sans/files/open-sans-latin-700-normal.woff2)}
+:root{--y:#FFE14D;--plum:#4E3047}
+*{box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#170C14;font-family:Mr,system-ui,sans-serif}
+#bg{position:absolute;inset:0;background:radial-gradient(1400px 900px at 18% 20%,#4A2742 0%,#2A1626 45%,#170C14 100%)}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.33;animation:drift 18s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate(120px,-80px) scale(1.15)}}
+#bar{position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(90deg,#EE3B33,#F15A4A 22%,#F7A541 45%,#FFE14D 60%,#F29A7A 78%,#E15AA5);z-index:50}
+#logo{position:absolute;right:56px;top:40px;height:32px;z-index:50;transition:opacity .5s}
+#cam{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;transition:transform 1.2s cubic-bezier(.65,0,.25,1)}
+#win{position:absolute;left:140px;top:84px;width:1640px;height:922px;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 40px 120px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08);opacity:0;transform:translateY(30px) scale(.98);transition:opacity .6s,transform .7s cubic-bezier(.2,.8,.2,1)}
+#win.on{opacity:1;transform:none}
+#demo{position:absolute;left:150px;top:36px;font:600 13px Mr;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);z-index:45}
+#spot{position:absolute;border-radius:10px;pointer-events:none;opacity:0;transition:all 1.2s cubic-bezier(.65,0,.25,1);z-index:30}
+#spot.on{opacity:1;box-shadow:0 0 0 9999px rgba(20,10,18,.5),0 0 0 3px rgba(255,225,77,.95),0 0 30px 6px rgba(255,225,77,.35)}
+#txt{position:absolute;inset:0;pointer-events:none;z-index:35}
+.line{position:absolute;color:#fff;font-weight:700;opacity:0;transform:translateY(24px);transition:opacity .7s,transform .8s cubic-bezier(.2,.8,.2,1)}
+.line.in{opacity:1;transform:none}.line.out{opacity:0;transform:translateY(-16px)}
+.y{color:var(--y)}.big{font-size:150px;font-weight:800;line-height:1;letter-spacing:-.03em}.mid{font-size:44px;font-weight:600;line-height:1.25}
+.src{font-size:17px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+.hook{font-size:74px;font-weight:700;line-height:1.18}.kick{font-size:96px;font-weight:800;line-height:1.02;letter-spacing:-.02em}
+#lower{position:absolute;left:56px;bottom:46px;background:#0E080C;padding:13px 24px 15px 20px;border-left:6px solid var(--y);opacity:0;transform:translateX(-30px);transition:all .6s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 40px rgba(0,0,0,.45);z-index:40}
+#lower.on{opacity:1;transform:none}
+#lower .n{display:block;color:var(--y);font-size:15px;font-weight:800;letter-spacing:.2em}
+#lower .t{display:block;color:#fff;font-size:32px;font-weight:700;margin-top:2px}
+#lower .tl{display:flex;gap:8px;margin-top:8px}
+#lower .tl span{display:inline-flex;align-items:center;gap:7px;background:#272027;color:#EDE6EC;font-size:15px;font-weight:600;padding:4px 10px 4px 8px;border-radius:6px}
+#lower .tl i{width:14px;height:14px;border-radius:4px}
+#badge{position:absolute;right:56px;top:40px;background:#111;color:#fff;font-weight:800;font-size:17px;letter-spacing:.14em;padding:8px 13px;border-radius:6px;opacity:0;transition:opacity .4s;z-index:51}
+#badge.on{opacity:.92}#badge b{color:var(--y)}
+#cursor{position:absolute;left:0;top:0;width:28px;height:28px;pointer-events:none;opacity:0;transition:left .9s cubic-bezier(.65,0,.25,1),top .9s cubic-bezier(.65,0,.25,1),opacity .3s;z-index:60}
+#cursor.on{opacity:1}#cursor .ring{position:absolute;left:-14px;top:-14px;width:28px;height:28px;border-radius:50%;border:3px solid var(--y);opacity:0}
+#cursor.click .ring{animation:ring .6s ease-out}@keyframes ring{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(1.8)}}
+#endcard{position:absolute;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;gap:120px;opacity:0;transition:opacity .9s;z-index:70}
+#endcard.on{opacity:1}#endcard img{height:330px}#endcard div{font-size:62px;font-weight:700;color:var(--plum)}
+/* shared app bits */
+.app{position:absolute;inset:0;display:flex;flex-direction:column}
+.ic{display:inline-block;width:18px;height:18px;border-radius:4px;background:currentColor;opacity:.75}
+.new{animation:rowin .6s cubic-bezier(.2,.8,.2,1)}@keyframes rowin{from{opacity:0;transform:translateY(-8px);background:#FFF4CC}to{opacity:1;transform:none}}
+.flash{animation:flash 1.6s ease}@keyframes flash{0%{background:#FFF4CC}100%{background:transparent}}
+/* OpsRamp */
+.or{font-family:OS,Inter,sans-serif;color:#1d2433;background:#F3F5F8}
+.or .top{height:50px;background:#0B1F3A;color:#fff;display:flex;align-items:center;gap:26px;padding:0 20px;font-size:14px}
+.or .top b{font-size:18px;letter-spacing:.01em}.or .top .nav{opacity:.8}.or .top .nav.on{opacity:1;border-bottom:3px solid #2BA4E0;padding:14px 0 11px}
+.or .sub{height:52px;background:#fff;border-bottom:1px solid #DDE3EA;display:flex;align-items:center;gap:14px;padding:0 22px;font-size:14px}
+.or .chip{border:1px solid #CBD3DD;border-radius:16px;padding:4px 12px;font-weight:600;font-size:13px}
+.or table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff}
+.or th{text-align:left;font-weight:600;color:#5a6577;background:#F7F9FB;border-bottom:1px solid #DDE3EA;padding:9px 10px}
+.or td{border-bottom:1px solid #EEF1F5;padding:9px 10px;white-space:nowrap}
+.sev{display:inline-flex;align-items:center;gap:6px;font-weight:600}.sev i{width:10px;height:10px;border-radius:50%}
+.or .inf{background:#FFF8E6}.or .inf td:first-child{border-left:4px solid #F59E0B}
+.or .child td{color:#6a7486;background:#FBFCFD}.or .child td:nth-child(2){padding-left:34px}
+.drawer{position:absolute;top:102px;right:0;bottom:0;width:640px;background:#fff;box-shadow:-12px 0 40px rgba(0,0,0,.18);transform:translateX(100%);transition:transform .6s cubic-bezier(.2,.8,.2,1);padding:20px 24px;overflow:hidden}
+.drawer.on{transform:none}
+/* ServiceNow */
+.sn{font-family:Lato,Inter,sans-serif;color:#1F2933;background:#F1F3F5}
+.sn .un{height:48px;background:#1B2B37;color:#fff;display:flex;align-items:center;gap:22px;padding:0 18px;font-size:14px}
+.sn .un .pill{background:rgba(255,255,255,.12);border-radius:16px;padding:5px 14px;font-weight:700}
+.sn .rail{width:54px;background:#fff;border-right:1px solid #DEE2E6;display:flex;flex-direction:column;align-items:center;gap:22px;padding-top:18px;color:#5A6872}
+.sn .tabs{height:40px;background:#fff;border-bottom:1px solid #DEE2E6;display:flex;align-items:flex-end;gap:2px;padding-left:12px;font-size:13.5px}
+.sn .tabs span{padding:9px 16px;border-radius:6px 6px 0 0;color:#5A6872}.sn .tabs span.on{background:#F1F3F5;color:#1F2933;font-weight:700;border:1px solid #DEE2E6;border-bottom:0}
+.sn .btn{border:1px solid #9AA5B1;border-radius:6px;padding:7px 14px;font-weight:700;font-size:14px;background:#fff}
+.sn .btn.p{background:#1B2B37;color:#fff;border-color:#1B2B37}
+.sn .hl{display:flex;gap:0;background:#fff;border:1px solid #DEE2E6;border-radius:8px}
+.sn .hl div{padding:10px 18px;border-right:1px solid #EEF0F2;font-size:13px;color:#5A6872}.sn .hl b{display:block;color:#1F2933;font-size:15px;margin-top:2px}
+.sn .f{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px}
+.sn .f label{display:block;font-size:12.5px;color:#5A6872;margin-bottom:4px}.sn .f .v{border:1px solid #CDD3DA;border-radius:6px;padding:7px 10px;font-size:14px;background:#fff;min-height:34px}
+.sn .act{background:#fff;border:1px solid #DEE2E6;border-radius:8px;display:flex;flex-direction:column}
+.sn .note{border-top:1px solid #EEF0F2;padding:12px 16px;font-size:13.5px;line-height:1.5}
+.sn .note .who{display:flex;align-items:center;gap:8px;font-weight:700}.sn .note .av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}
+.sn .note .tag{font-size:11.5px;font-weight:700;color:#8A5300;background:#FFF1D6;border-radius:4px;padding:1px 6px}
+/* Teams */
+.tm{font-family:Inter,sans-serif;color:#242424;background:#F5F5F5}
+.tm .tb{height:48px;background:#EBEBEB;display:flex;align-items:center;justify-content:center;position:relative;font-size:13px;color:#616161}
+.tm .tb .s{width:520px;height:30px;border-radius:6px;background:#fff;border:1px solid #E0E0E0;display:flex;align-items:center;padding:0 12px}
+.tm .ab{width:68px;background:#EBEBEB;display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:6px;font-size:10.5px;color:#616161}
+.tm .ab div{width:60px;padding:8px 0;border-radius:6px;text-align:center}.tm .ab div.on{background:#fff;color:#5B5FC7;font-weight:700}
+.tm .ab i{display:block;width:22px;height:20px;margin:0 auto 3px;border-radius:5px;border:2px solid currentColor}
+.tm .list{width:320px;background:#FAFAFA;border-right:1px solid #E0E0E0;padding:12px 10px;font-size:13.5px}
+.tm .list .it{display:flex;gap:10px;align-items:center;padding:9px 8px;border-radius:6px}.tm .list .it.on{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.tm .av{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex:none}
+.tm .mv{background:linear-gradient(135deg,#EE3B33,#F7A541 55%,#E15AA5)}
+.tm .card{background:#fff;border:1px solid #E0E0E0;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.06);width:640px;font-size:14px}
+.tm .card .hd{padding:14px 18px;border-bottom:1px solid #EDEBE9;font-weight:700;font-size:16px}
+.tm .fact{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;padding:14px 18px;font-size:13.5px}.tm .fact span{color:#616161}
+.tm .tbtn{border:1px solid #D1D1D1;border-radius:4px;padding:6px 16px;font-weight:600;font-size:13.5px;background:#fff}
+.tm .tbtn.p{background:#5B5FC7;color:#fff;border-color:#5B5FC7}
+/* Copilot Studio */
+.cs{font-family:Inter,sans-serif;color:#242424;background:#FAF9F8}
+.cs .hd{height:48px;background:#fff;border-bottom:1px solid #E1DFDD;display:flex;align-items:center;gap:16px;padding:0 18px;font-size:14px}
+.cs .nav{width:56px;background:#F3F2F1;border-right:1px solid #E1DFDD;display:flex;flex-direction:column;align-items:center;gap:20px;padding-top:16px;color:#605E5C}
+.cs .tabs{display:flex;gap:26px;padding:0 24px;border-bottom:1px solid #E1DFDD;font-size:14px;background:#fff}
+.cs .tabs span{padding:12px 0;color:#605E5C}.cs .tabs span.on{color:#242424;font-weight:600;border-bottom:3px solid #0F6CBD}
+.cs .node{position:absolute;width:300px;background:#fff;border:1px solid #D1D1D1;border-radius:8px;padding:10px 12px;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:border-color .4s,box-shadow .4s}
+.cs .node .t{display:flex;align-items:center;gap:8px;font-weight:600}.cs .node .k{font-size:11.5px;color:#605E5C;margin-top:3px}
+.cs .node .st{margin-left:auto;font-size:11.5px;font-weight:600;color:#8A8886}
+.cs .node.run{border-color:#0F6CBD;box-shadow:0 0 0 3px rgba(15,108,189,.15)}.cs .node.run .st{color:#0F6CBD}
+.cs .node.ok .st{color:#107C10}.cs .node .ti{width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex:none}
+/* SD-WAN */
+.sd{font-family:OS,Inter,sans-serif;color:#22303E;background:#F4F6F8}
+.sd .hd{height:50px;background:#16324F;color:#fff;display:flex;align-items:center;gap:24px;padding:0 20px;font-size:14px}
+.sd .nav{width:210px;background:#fff;border-right:1px solid #DCE2E8;padding:14px 0;font-size:14px}
+.sd .nav div{padding:9px 20px;color:#4A5A6A}.sd .nav div.on{background:#E8F1FA;color:#16324F;font-weight:700;border-left:4px solid #2E7BD6}
+.sd table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff}
+.sd th{text-align:left;color:#5A6A7A;font-weight:600;padding:10px;border-bottom:1px solid #DCE2E8;background:#F8FAFC}.sd td{padding:11px 10px;border-bottom:1px solid #EEF2F5;transition:background .6s,color .6s}
+.st-b{display:inline-block;border-radius:4px;padding:2px 8px;font-weight:700;font-size:12px}
+/* carrier portal */
+.cp{font-family:Inter,sans-serif;color:#1E2430;background:#F6F7F9}
+.cp .hd{height:56px;background:#2D3142;color:#fff;display:flex;align-items:center;gap:24px;padding:0 24px;font-size:14px}
+/* ---------- generic bits */
+.obody{flex:1;min-height:0;overflow:hidden;position:relative}
+.gtab{display:flex;gap:22px;font-size:14px;border-bottom:1px solid #E1E4E8}.gtab span{padding:8px 0;color:#5A6A7A}.gtab span.on{color:#1F2933;font-weight:700;border-bottom:3px solid var(--acc,#2E7BD6)}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:9px 14px;font-size:14px}.kv>span:nth-child(odd){color:#6B7685}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff}.tbl th{text-align:left;font-weight:600;color:#5a6577;background:#F7F9FB;border-bottom:1px solid #DDE3EA;padding:9px 10px;white-space:nowrap}.tbl td{border-bottom:1px solid #EEF1F5;padding:9px 10px;white-space:nowrap;transition:background .6s,color .6s}
+.tbl tr.sel td{background:#EAF3FC}.tbl tr.hot td{background:#FFF4E5}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px}
+.pl{display:inline-block;border-radius:4px;padding:2px 8px;font-weight:700;font-size:12px;white-space:nowrap}
+.pl.r{background:#FDECEA;color:#B42318}.pl.a{background:#FEF3E2;color:#A15C07}.pl.g{background:#E6F4EA;color:#1E7E34}.pl.b{background:#E8F1FA;color:#175CD3}.pl.n{background:#EEF1F4;color:#4A5565}.pl.p{background:#F4EBFF;color:#6941C6}
+.crd{background:#fff;border:1px solid #DFE3E8;border-radius:8px;padding:14px 16px;min-width:0}
+.crd h4{margin:0 0 10px;font-size:13px;font-weight:700;letter-spacing:.02em;color:#3D4752}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+pre.code{background:#F3F2F1;border-radius:6px;padding:10px;font-size:12px;margin:0;white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace}
+.typing::after{content:"▍";animation:blink 1s steps(1) infinite;color:#888}@keyframes blink{50%{opacity:0}}
+.bar{height:8px;background:#E9EDF1;border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:#2E7BD6;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.grow{animation:grow .7s cubic-bezier(.2,.8,.2,1)}@keyframes grow{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+/* ---------- vSphere Client */
+.vc{font-family:OS,Inter,sans-serif;color:#2B3A42;background:#FAFAFA}
+.vc .hd{height:48px;background:#1D2830;color:#fff;display:flex;align-items:center;gap:18px;padding:0 18px;font-size:14px}
+.vc .hd .srch{margin-left:120px;width:460px;height:30px;border-radius:4px;background:#34444E;display:flex;align-items:center;padding:0 12px;color:#9FB0BA;font-size:13px}
+.vc .tree{width:300px;background:#fff;border-right:1px solid #DDE3E6;font-size:13.5px;padding:8px 0}
+.vc .tree .ti{display:flex;gap:10px;justify-content:center;padding:6px 0 10px;border-bottom:1px solid #EEF1F3;margin-bottom:6px}.vc .tree .ti i{width:22px;height:20px;border-radius:4px;border:2px solid #8DA2AE}.vc .tree .ti i.on{border-color:#0072A3;background:#E1F1F6}
+.vc .tree div.n{padding:5px 10px;white-space:nowrap;display:flex;align-items:center;gap:7px}.vc .tree div.n.on{background:#D8E3E9;font-weight:700}
+.vc .ico{width:15px;height:13px;border-radius:2px;display:inline-block;flex:none}
+.vc .obj{padding:12px 20px 0;background:#fff;border-bottom:1px solid #DDE3E6}
+.vc .obj .nm{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:600}
+.vc .obj .acts{display:flex;gap:6px;margin-left:10px}.vc .obj .acts span{width:28px;height:26px;border:1px solid #C7D1D6;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:#49606D}
+.vc .obj .btn{border:1px solid #0072A3;color:#0072A3;border-radius:3px;padding:4px 12px;font-size:12px;font-weight:700;letter-spacing:.06em}
+.vc .tabs{display:flex;gap:24px;font-size:14px;margin-top:10px}.vc .tabs span{padding:8px 0;color:#49606D}.vc .tabs span.on{color:#0072A3;border-bottom:3px solid #0072A3;font-weight:600}
+.vc .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;padding:14px 20px}
+.vc .card{background:#fff;border:1px solid #DDE3E6;border-radius:4px;padding:12px 14px;font-size:13.5px}
+.vc .card h5{margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:.08em;color:#49606D;text-transform:uppercase}
+.vc .alarm{margin:12px 20px 0;padding:9px 14px;border-radius:3px;font-size:13.5px;display:flex;align-items:center;gap:10px}
+.vc .alarm.r{background:#F5DBD9;border:1px solid #E62700;color:#8A1D07}.vc .alarm.y{background:#FEF3B5;border:1px solid #F0C000;color:#6B5200}.vc .alarm.g{background:#DFF0D0;border:1px solid #62A420;color:#2D5A0C}
+.vc .rt{height:236px;background:#fff;border-top:1px solid #C7D1D6;display:flex;flex-direction:column}
+.vc .rt .tb{display:flex;gap:18px;padding:0 16px;font-size:13px;border-bottom:1px solid #DDE3E6;background:#F4F6F7}.vc .rt .tb span{padding:7px 0;color:#49606D}.vc .rt .tb span.on{font-weight:700;color:#2B3A42;border-bottom:2px solid #0072A3}
+.vc .rt table{width:100%;border-collapse:collapse;font-size:12.5px}.vc .rt th{text-align:left;font-weight:600;color:#49606D;padding:6px 10px;border-bottom:1px solid #DDE3E6}.vc .rt td{padding:6px 10px;border-bottom:1px solid #EEF1F3;white-space:nowrap}
+/* ---------- Veeam Backup & Replication console */
+.vb{font-family:"Segoe UI",OS,Inter,sans-serif;color:#1E1E1E;background:#fff}
+.vb .tt{height:30px;background:#fff;display:flex;align-items:center;gap:10px;padding:0 12px;font-size:12.5px;border-bottom:1px solid #E3E3E3}
+.vb .rtabs{display:flex;gap:2px;padding:0 10px;background:#fff;font-size:13px}.vb .rtabs span{padding:6px 14px}.vb .rtabs span.on{background:#00B336;color:#fff;font-weight:600}
+.vb .rib{height:84px;background:#F7F7F7;border-top:1px solid #E3E3E3;border-bottom:1px solid #D9D9D9;display:flex;align-items:flex-end;gap:4px;padding:6px 12px}
+.vb .rib div{width:78px;text-align:center;font-size:11.5px;color:#333}.vb .rib div i{display:block;width:30px;height:30px;margin:0 auto 6px;border-radius:5px;background:#00B336;opacity:.85}.vb .rib div.off{opacity:.45}
+.vb .left{width:290px;border-right:1px solid #D9D9D9;display:flex;flex-direction:column;font-size:13px}
+.vb .left .tr{flex:1;padding:8px 0}.vb .left .tr div{padding:4px 12px;white-space:nowrap}.vb .left .tr div.on{background:#CDE8F7}
+.vb .left .nv div{display:flex;align-items:center;gap:10px;padding:7px 12px;border-top:1px solid #E3E3E3;font-weight:600}.vb .left .nv div i{width:18px;height:18px;border-radius:4px;background:#00B336;opacity:.8}.vb .left .nv div.on{background:#E6F6EA}
+.vb table{width:100%;border-collapse:collapse;font-size:13px}.vb th{text-align:left;font-weight:400;color:#555;padding:6px 10px;border-bottom:1px solid #D9D9D9;background:#FAFAFA}.vb td{padding:6px 10px;border-bottom:1px solid #F0F0F0;white-space:nowrap}
+.vb tr.sel td{background:#CDE8F7}
+.vb .sess{position:absolute;left:200px;top:120px;width:1100px;background:#fff;border:1px solid #B5B5B5;box-shadow:0 20px 60px rgba(0,0,0,.35);font-size:13px;opacity:0;transform:scale(.97);transition:all .5s cubic-bezier(.2,.8,.2,1)}
+.vb .sess.on{opacity:1;transform:none}
+.vb .sess .wt{height:34px;display:flex;align-items:center;padding:0 14px;border-bottom:1px solid #E3E3E3;font-weight:600}
+.vb .sess .sg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding:14px 18px;border-bottom:1px solid #E3E3E3}.vb .sess .sg b{display:block;margin-bottom:6px}.vb .sess .sg div div{display:flex;justify-content:space-between;color:#444;line-height:1.7}
+.vb .log div{display:flex;gap:10px;padding:5px 18px;border-bottom:1px solid #F3F3F3}.vb .log div span:last-child{margin-left:auto;color:#666}
+/* ---------- Microsoft admin portals (Defender, Entra, Intune) */
+.ms{font-family:Inter,"Segoe UI",sans-serif;color:#242424;background:#FAFAFA}
+.ms .hd{height:48px;background:#1B1A19;color:#fff;display:flex;align-items:center;gap:14px;padding:0 16px;font-size:14px}
+.ms .hd .waf{width:18px;height:18px;background-image:radial-gradient(#fff 1.4px,transparent 1.6px);background-size:6px 6px;opacity:.9}
+.ms .hd .srch{margin-left:60px;width:520px;height:30px;border-radius:4px;background:#fff;color:#707070;display:flex;align-items:center;padding:0 12px;font-size:13px}
+.ms .nav{width:250px;background:#F0F0F0;border-right:1px solid #E0E0E0;font-size:13.5px;padding:8px 0;overflow:hidden}
+.ms .nav div{padding:7px 16px;white-space:nowrap;color:#424242;display:flex;gap:10px;align-items:center}.ms .nav div i{width:15px;height:15px;border-radius:3px;border:1.6px solid #616161;flex:none}
+.ms .nav div.sec{font-weight:600;color:#242424;padding-top:12px}.ms .nav div.sub{padding-left:41px}.ms .nav div.on{background:#fff;font-weight:600;color:#0F6CBD;border-left:3px solid #0F6CBD;padding-left:13px}.ms .nav div.sub.on{padding-left:38px}
+.ms .crumb{font-size:13px;color:#616161;padding:14px 26px 0}
+.ms h1{font-size:24px;font-weight:600;margin:4px 0 0}
+.ms .cmd{display:flex;gap:18px;font-size:13.5px;padding:10px 0;color:#242424;flex-wrap:nowrap;white-space:nowrap}.ms .cmd span{display:inline-flex;gap:7px;align-items:center}.ms .cmd span::before{content:"";width:14px;height:14px;border-radius:3px;border:1.6px solid #0F6CBD}
+.ms .cmd span.hot{background:#0F6CBD;color:#fff;border-radius:4px;padding:5px 12px}.ms .cmd span.hot::before{border-color:#fff}
+.ms .tabs{display:flex;gap:24px;font-size:14px;border-bottom:1px solid #E0E0E0}.ms .tabs span{padding:9px 0;color:#424242}.ms .tabs span.on{font-weight:600;color:#242424;border-bottom:3px solid #0F6CBD}
+.ms table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff}.ms th{text-align:left;font-weight:600;color:#424242;padding:9px 10px;border-bottom:1px solid #E0E0E0}.ms td{padding:9px 10px;border-bottom:1px solid #F0F0F0;white-space:nowrap;transition:background .6s}
+.ms tr.sel td{background:#EBF3FC}
+.ms .sv{display:inline-flex;align-items:center;gap:6px;font-weight:600}.ms .sv i{width:10px;height:10px;border-radius:2px}
+.ms .pane{position:absolute;top:0;right:0;bottom:0;width:560px;background:#fff;box-shadow:-10px 0 36px rgba(0,0,0,.16);transform:translateX(105%);transition:transform .6s cubic-bezier(.2,.8,.2,1);padding:20px 24px;overflow:hidden;z-index:5}
+.ms .pane.on{transform:none}
+.ms .fl{border:1px solid #E0E0E0;border-radius:8px;background:#fff;padding:14px 16px}
+.ms .fl h4{margin:0 0 10px;font-size:14px;font-weight:600}
+.ms .btn{display:inline-block;border:1px solid #D1D1D1;border-radius:4px;padding:6px 14px;font-weight:600;font-size:13.5px;background:#fff}.ms .btn.p{background:#0F6CBD;color:#fff;border-color:#0F6CBD}
+/* ---------- generic web portal */
+.wp{font-family:Inter,sans-serif;color:#1E2430;background:#F6F7F9}
+.wp .hd{height:56px;color:#fff;display:flex;align-items:center;gap:24px;padding:0 24px;font-size:14px}
+/* ---------- Outlook on the web */
+.ol{font-family:"Segoe UI",Inter,sans-serif;color:#242424;background:#F5F5F5}
+.ol .hd{height:48px;background:#0F6CBD;color:#fff;display:flex;align-items:center;gap:16px;padding:0 16px;font-size:14px}
+.ol .rib{height:44px;background:#fff;border-bottom:1px solid #E0E0E0;display:flex;align-items:center;gap:16px;padding:0 16px;font-size:13.5px}
+.ol .rib span{display:inline-flex;gap:6px;align-items:center;padding:5px 8px;border-radius:4px}.ol .rib span.on{background:#EBF3FC;color:#0F6CBD;font-weight:600}
+</style></head>
+</style></head>
+<body>
+<div id="bg"><div class="blob" style="width:700px;height:700px;left:-120px;top:-160px;background:#E15AA5"></div><div class="blob" style="width:600px;height:600px;right:-100px;bottom:-200px;background:#F7A541;animation-delay:-6s"></div></div>
+<div id="bar"></div>
+<div id="cam"><div id="win"></div></div>
+<div id="demo">Demo environment · sample data</div>
+<div id="spot"></div>
+<div id="txt"></div>
+<img id="logo" src="movate_full_white.png">
+<div id="badge"><b>2×</b> SPEED</div>
+<div id="lower"><span class="n"></span><span class="t"></span><div class="tl"></div></div>
+<div id="cursor"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M4 2l15 9-6.5 1.5L9 19z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="ring"></span></div>
+<div id="endcard"><img src="movate_mark.png"><div>Your Applied AI Partner</div></div>
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const W = () => $("#win");
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const cam = { k: 1, tx: 0, ty: 0 };
+const TC = { OpsRamp: "#1F5BA8", ServiceNow: "#2F5B4F", "Copilot Studio": "#5B5FC7", "Key Vault": "#0078D4", "Microsoft Teams": "#5B5FC7", "SD-WAN Orchestrator": "#00838F", "Carrier portal": "#7A4A6E", "Mova iO": "#E15AA5", vCenter: "#0072A3", "Veeam": "#00B336", "Microsoft Defender": "#0F6CBD", "Defender for Office 365": "#0F6CBD", "Defender for Endpoint": "#0F6CBD", "Microsoft Sentinel": "#0078D4", "Entra ID": "#0078D4", "Intune": "#0F6CBD", "Outlook": "#0F6CBD", "UPS management": "#C2410C", "Field Service": "#2F5B4F", "Utility portal": "#7A4A6E", "Now Assist": "#62D84E", "Virtual Agent": "#2F5B4F", "Exchange Online": "#0F6CBD", "PIM": "#0078D4" };
+const now0 = [7, 38]; let clockMin = 0;
+const tm = (add = 0) => { const m = now0[1] + clockMin + add; return `${String(now0[0] + Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
+const SITES0 = [["MUM", "Mumbai Sales Office", "mum-sales-edge-01", 410, 4.1], ["PUN", "Pune Sales Office", "pun-sales-edge-01", 388, 3.8], ["DEL", "Delhi Sales Office", "del-sales-edge-01", 395, 4.4], ["IND", "Indore Sales Office", "ind-sales-edge-01", 362, 3.6], ["KOL", "Kolkata Sales Office", "kol-sales-edge-01", 377, 3.9]];
+const D = window.D = {
+  ready: () => true,
+  // ---------- film chrome
+  logo(on) { $("#logo").style.opacity = on ? 1 : 0; },
+  demo(on) { $("#demo").style.opacity = on ? 1 : 0; },
+  line(html, cls, x, y, delay = 0, style = "") { const d = document.createElement("div"); d.className = "line " + cls; d.innerHTML = html; d.style.left = x + "px"; d.style.top = y + "px"; if (style) d.style.cssText += style; $("#txt").appendChild(d); setTimeout(() => d.classList.add("in"), 40 + delay); return true; },
+  clearText() { const old = $$("#txt > *"); old.forEach((c) => { c.classList.add("out"); c.classList.remove("in"); }); setTimeout(() => old.forEach((c) => c.remove()), 750); },
+  count(sel, to, pre = "", suf = "", ms = 1400) { const el = $$("#txt .line").at(-1); if (!el) return; const t0 = performance.now(); const f = (t) => { const p = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - p, 3); el.textContent = pre + Math.round(to * e) + suf; if (p < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); },
+  stat(n, pre, suf, text, src) { D.clearText(); setTimeout(() => { D.line("", "big y", 150, 330); D.count(null, n, pre, suf); D.line(text, "mid", 154, 500, 350, "width:1300px"); D.line(src, "src", 156, 640 + (text.length > 70 ? 54 : 0), 700); }, 760); },
+  step(n, t, tools) { const l = $("#lower"); l.classList.remove("on"); setTimeout(() => { $(".n", l).textContent = "STEP " + String(n).padStart(2, "0"); $(".t", l).textContent = t; $(".tl", l).innerHTML = (tools || []).map((x) => `<span><i style="background:${TC[x] || "#666"}"></i>${x}</span>`).join(""); l.classList.add("on"); }, 380); },
+  stepOff() { $("#lower").classList.remove("on"); },
+  speed(on) { $("#badge").classList.toggle("on", on); },
+  end(on) { $("#endcard").classList.toggle("on", on); },
+  win(on) { W().classList.toggle("on", on); },
+  // ---------- camera, spotlight, cursor (selectors resolve inside the app window)
+  setCam(k, tx, ty) { Object.assign(cam, { k, tx, ty }); $("#cam").style.transform = `translate(${tx}px,${ty}px) scale(${k})`; },
+  local(el) { const r = el.getBoundingClientRect(); return { x: (r.x - cam.tx) / cam.k, y: (r.y - cam.ty) / cam.k, w: r.width / cam.k, h: r.height / cam.k }; },
+  stage(l) { return { x: l.x * cam.k + cam.tx, y: l.y * cam.k + cam.ty, w: l.w * cam.k, h: l.h * cam.k }; },
+  el(sel) { return typeof sel === "string" ? $(sel, W()) : sel; },
+  focus(sel, o = {}) {
+    const e = D.el(sel); if (!e) return false; const p = o.pad == null ? 8 : o.pad; const l = D.local(e); l.x -= p; l.y -= p; l.w += 2 * p; l.h += 2 * p;
+    let k = Math.min(o.maxK || 1.8, 1920 * (o.fill || 0.8) / l.w, 1080 * (o.fill || 0.8) / l.h); k = Math.max(1, k);
+    let tx = 960 - (l.x + l.w / 2) * k, ty = 540 - (l.y + l.h / 2) * k; tx = Math.min(0, Math.max(1920 - 1920 * k, tx)); ty = Math.min(0, Math.max(1080 - 1080 * k, ty));
+    if (o.zoom === false) { k = cam.k; tx = cam.tx; ty = cam.ty; }
+    D.setCam(k, tx, ty);
+    if (o.spot !== false) { const s = D.stage(l), sp = $("#spot"); Object.assign(sp.style, { left: s.x + "px", top: s.y + "px", width: s.w + "px", height: s.h + "px" }); sp.classList.add("on"); } else D.spotOff();
+    return true;
+  },
+  zoomOut() { D.setCam(1, 0, 0); D.spotOff(); },
+  spotOff() { $("#spot").classList.remove("on"); },
+  cursor(sel, click) { const e = D.el(sel); if (!e) return; const s = D.stage(D.local(e)), c = $("#cursor"); c.classList.add("on"); c.style.left = s.x + s.w / 2 + "px"; c.style.top = s.y + s.h / 2 + "px"; if (click) setTimeout(() => { c.classList.remove("click"); void c.offsetWidth; c.classList.add("click"); }, 950); },
+  cursorOff() { $("#cursor").classList.remove("on"); },
+  tick(m) { clockMin += m; },
+
+  // ---------- generic DOM operations inside the app window
+  all(sel) { return typeof sel === "string" ? $$(sel, W()) : [sel]; },
+  show(kind, o) { W().innerHTML = SH[kind](o || {}); return true; },
+  html(sel, h) { const e = D.el(sel); if (!e) return false; e.innerHTML = h; return true; },
+  set(sel, h) { const e = D.el(sel); if (!e) return false; e.innerHTML = h; e.classList.remove("flash"); void e.offsetWidth; e.classList.add("flash"); return true; },
+  add(sel, h, first) { const e = D.el(sel); if (!e) return false; const t = document.createElement("template"); t.innerHTML = h.trim(); const ns = [...t.content.children]; ns.forEach((n) => n.classList.add("new")); if (first) e.prepend(...ns); else e.append(...ns); return true; },
+  cls(sel, add, rem) { D.all(sel).forEach((e) => { if (rem) e.classList.remove(...rem.split(" ")); if (add) e.classList.add(...add.split(" ")); }); return true; },
+  css(sel, css) { D.all(sel).forEach((e) => (e.style.cssText += css)); return true; },
+  flash(sel) { D.all(sel).forEach((e) => { e.classList.remove("flash"); void e.offsetWidth; e.classList.add("flash"); }); return true; },
+  rm(sel) { D.all(sel).forEach((e) => e.remove()); return true; },
+  type(sel, text, ms = 26) { const e = D.el(sel); if (!e) return false; e.textContent = ""; e.classList.add("typing"); let i = 0; const t = setInterval(() => { e.textContent = text.slice(0, ++i); if (i >= text.length) { clearInterval(t); e.classList.remove("typing"); } }, ms); return true; },
+  typeHtml(sel, html, ms = 14) { const e = D.el(sel); if (!e) return false; const tmp = document.createElement("div"); tmp.innerHTML = html; const full = tmp.innerHTML; let i = 0; e.classList.add("typing"); const t = setInterval(() => { i += 3; let s = full.slice(0, i); const lt = s.lastIndexOf("<"), gt = s.lastIndexOf(">"); if (lt > gt) { i = full.indexOf(">", i) + 1; s = full.slice(0, i); } e.innerHTML = s; if (i >= full.length) { clearInterval(t); e.classList.remove("typing"); } }, ms); return true; },
+  num(sel, from, to, suf = "", ms = 1600, dec = 0) { const e = D.el(sel); if (!e) return false; const t0 = performance.now(); const f = (t) => { const p = Math.min(1, (t - t0) / ms), q = 1 - Math.pow(1 - p, 3); e.textContent = (from + (to - from) * q).toFixed(dec) + suf; if (p < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); return true; },
+  bar(sel, pct, col) { const e = D.el(sel); if (!e) return false; e.style.width = pct + "%"; if (col) e.style.background = col; return true; },
+  seq(steps) { steps.forEach(([ms, fn, ...a]) => setTimeout(() => D[fn](...a), ms)); return true; },
+  popBelow(sel, html, id = "pop") { const a = D.el(sel); if (!a) return false; const rw = W().getBoundingClientRect(), ra = a.getBoundingClientRect(), k = cam.k; const d = document.createElement("div"); d.id = id; d.className = "new"; d.style.cssText = `position:absolute;z-index:20;left:${(ra.x - rw.x) / k}px;top:${(ra.bottom - rw.y) / k + 4}px`; d.innerHTML = html; W().firstElementChild.appendChild(d); return true; },
+  // Copilot Studio activity map helpers (work with SH.copilot)
+  csStep(i, state) { const n = $(`.node[data-i="${i}"]`, W()); if (!n) return false; n.classList.remove("run", "ok"); if (state === "run") { n.classList.add("run"); $(".st", n).textContent = "Running"; } else { n.classList.add("ok"); $(".st", n).textContent = "✓ " + n.dataset.d; } return true; },
+  csDone() { const s = $("#csst", W()); s.textContent = "Complete"; s.style.background = "#DFF6DD"; s.style.color = "#107C10"; return true; },
+  csTranscript(html) { const d = document.createElement("div"); d.className = "new"; d.style.cssText = "background:#EBF3FC;border-radius:6px;padding:10px 12px;margin-bottom:10px"; d.innerHTML = html; $("#cstr", W()).appendChild(d); return true; },
+  csDetail(i, o) {
+    const det = $("#csdet", W()); $$(".node", W()).forEach((x) => (x.style.outline = "")); const n = $(`.node[data-i="${i}"]`, W()); if (n) n.style.outline = "2px solid #0F6CBD";
+    det.innerHTML = `<div style="width:440px;padding:16px 18px;font-size:13.5px"><div style="font-weight:700;font-size:15px">${o.title}</div><div style="color:#605E5C;margin:2px 0 12px">${o.sub}</div><div style="font-weight:600;margin-bottom:6px">Inputs</div><pre class="code" style="margin-bottom:12px">${o.inp}</pre><div style="font-weight:600;margin-bottom:6px">Outputs</div><pre class="code">${o.out}</pre><div style="margin-top:12px;color:#0F6CBD;font-weight:600">Show rationale</div></div>`;
+    det.style.width = "440px"; return true;
+  },
+  // Teams approval countdown
+  tmCountdown(n = 10) { const b = $("#apbar", W()); if (b) { b.style.transition = `width ${n}s linear`; b.style.width = "0%"; } const t = setInterval(() => { n--; const c = $("#apcd b", W()); if (c) c.textContent = n + " s"; if (n <= 0) clearInterval(t); }, 1000); window.__apT = t; return true; },
+  tmApprove(who, after) { clearInterval(window.__apT); const b = $("#apbar", W()); if (b) { b.style.transition = "none"; b.style.width = "0%"; } const cd = $("#apcd", W()); if (cd) cd.innerHTML = `<b style='color:#107C10'>✓ Approved by ${who}</b>`; else { const d = document.createElement("div"); d.className = "new"; d.style.cssText = "margin:4px 18px 0;padding:10px 12px;background:#DFF6DD;border-radius:6px;font-size:13.5px"; d.innerHTML = `<b style='color:#107C10'>✓ Approved by ${who}</b>`; $("#apbtns", W()).before(d); } $("#apbtns", W()).innerHTML = `<span style="font-size:13.5px;color:#616161">${after}</span>`; return true; },
+};
+
+const AV = (n) => n.split(/\s+/).map((x) => x[0]).join("").slice(0, 2).toUpperCase();
+const SH = {
+  // OpsRamp: o.nav, o.sub (html), o.body (html), o.drawer
+  opsramp(o) {
+    return `<div class="app or"><div class="top"><b>OpsRamp</b>${["Dashboards", "Infrastructure", "Command Center", "Automation", "Setup"].map((n) => `<span class="nav ${n === (o.nav || "Command Center") ? "on" : ""}">${n}</span>`).join("")}<span style="margin-left:auto;opacity:.85">Client: Global Operations</span><span style="width:30px;height:30px;border-radius:50%;background:#2BA4E0;display:inline-flex;align-items:center;justify-content:center;font-weight:700">PR</span></div>
+      ${o.sub ? `<div class="sub">${o.sub}</div>` : ""}<div class="obody" style="padding:14px 18px">${o.body || ""}</div>${o.drawer ? `<div class="drawer" id="ordr"></div>` : ""}</div>`;
+  },
+  // ServiceNow: o.tab, o.ws, o.body
+  snow(o) {
+    return `<div class="app sn"><div class="un"><b style="font-size:17px">servicenow</b><span>All</span><span>Favorites</span><span>History</span><span>Workspaces</span><span class="pill" style="margin-left:40px">${o.ws || "Service Operations Workspace"}</span><span style="margin-left:auto;background:rgba(255,255,255,.12);border-radius:16px;padding:5px 160px 5px 14px;opacity:.8">Search</span><span style="width:30px;height:30px;border-radius:50%;background:#3E8E7E;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">${o.me || "PR"}</span></div>
+      <div style="flex:1;display:flex;min-height:0"><div class="rail"><span class="ic"></span><span class="ic"></span><span class="ic"></span><span class="ic"></span><span class="ic"></span></div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0"><div class="tabs">${(o.tabs || ["Home", "Incidents"]).map((t) => `<span>${t}</span>`).join("")}${o.tab ? `<span class="on" id="sntab">${o.tab}</span>` : ""}</div>
+      <div style="padding:16px 20px;display:flex;flex-direction:column;gap:14px;min-height:0;flex:1;position:relative">${o.body || ""}</div></div></div></div>`;
+  },
+  // Teams: o.view chat|channel, o.items [[name, preview, on]], o.title, o.agent (bool: title is an agent), o.tab, o.channel
+  teams(o) {
+    const isA = (n) => /^Mova/.test(n);
+    const av = (n, s = "") => `<span class="av ${isA(n) ? "mv" : ""}" style="${isA(n) ? "" : "background:" + (o.colors && o.colors[n] || "#6264A7")};${s}">${isA(n) ? "M" : AV(n)}</span>`;
+    const chat = (o.view || "chat") === "chat";
+    return `<div class="app tm"><div class="tb"><span style="position:absolute;left:18px;font-weight:600;color:#424242">Microsoft Teams</span><span class="s">Search</span><span class="av" style="position:absolute;right:16px;width:28px;height:28px;background:#C4314B;font-size:11px">${o.me || "PR"}</span></div>
+      <div style="flex:1;display:flex;min-height:0"><div class="ab">${["Activity", "Chat", "Teams", "Calendar", "Calls", "OneDrive", "Apps"].map((a) => `<div class="${(chat && a === "Chat") || (!chat && a === "Teams") ? "on" : ""}"><i></i>${a}</div>`).join("")}</div>
+      <div class="list"><div style="font-weight:700;font-size:16px;padding:4px 8px 12px">${chat ? "Chat" : "Teams"}</div>${chat ? (o.items || []).map(([n, p, on]) => `<div class="it ${on ? "on" : ""}">${av(n)}<div style="min-width:0"><div style="font-weight:${on ? 700 : 600}">${n}</div><div style="color:#616161;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p}</div></div></div>`).join("") : `<div class="it"><span class="av" style="background:#4E3047;border-radius:6px">${AV(o.team || "IT Operations")}</span><b>${o.team || "IT Operations"}</b></div><div style="padding:2px 0 0 52px;line-height:2;color:#424242">${(o.channels || ["General", "Major incidents", "Site updates", "NOC handover"]).map((c) => c === o.channel ? `<b style="color:#5B5FC7">${c}</b>` : c).join("<br>")}</div>`}</div>
+      <div style="flex:1;display:flex;flex-direction:column;background:#fff;min-width:0"><div style="height:58px;border-bottom:1px solid #E0E0E0;display:flex;align-items:center;gap:12px;padding:0 20px">${chat ? av(o.title) : `<span class="av" style="background:#4E3047;border-radius:6px">${AV(o.team || "IT Operations")}</span>`}<b style="font-size:16px">${chat ? o.title : (o.team || "IT Operations") + " › " + o.channel}</b><span style="margin-left:18px;font-weight:600;border-bottom:3px solid #5B5FC7;padding:18px 0 15px">${chat ? "Chat" : "Posts"}</span><span style="color:#616161">${chat ? "About" : "Files"}</span></div>
+      <div id="tmmsgs" style="flex:1;padding:22px 30px;display:flex;flex-direction:column;gap:18px;overflow:hidden;background:#F5F5F5"></div>
+      <div style="margin:0 30px 18px;border:1px solid #E0E0E0;border-radius:6px;padding:12px 14px;color:#8A8886;background:#fff;font-size:14px" id="tmcompose">Type a message</div></div></div></div>`;
+  },
+  // Copilot Studio activity: o.agent, o.run, o.payload, o.nodes [[title, kind, color, dur]]
+  copilot(o) {
+    const N = o.nodes, pos = (i) => [40 + (i % 2) * 340, 24 + i * (N.length > 10 ? 58 : 66)];
+    let svg = `<svg style="position:absolute;inset:0" width="900" height="800">`; for (let i = 1; i < N.length; i++) { const [x1, y1] = pos(i - 1), [x2, y2] = pos(i); svg += `<path d="M${x1 + 150} ${y1 + 52} C ${x1 + 150} ${y1 + 62}, ${x2 + 150} ${y2 - 10}, ${x2 + 150} ${y2}" stroke="#C8C6C4" stroke-width="2" fill="none"/>`; } svg += `</svg>`;
+    return `<div class="app cs"><div class="hd"><b>Copilot Studio</b><span style="color:#605E5C">›</span><span>${o.agent}</span><span style="margin-left:auto;border:1px solid #D1D1D1;border-radius:4px;padding:5px 12px;color:#605E5C">Environment: Movate Demo (default)</span><span style="background:#0F6CBD;color:#fff;border-radius:4px;padding:6px 14px;font-weight:600">Publish</span></div>
+      <div style="flex:1;display:flex;min-height:0"><div class="nav"><span class="ic"></span><span class="ic"></span><span class="ic"></span><span class="ic"></span><span class="ic"></span></div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0"><div class="tabs">${["Overview", "Knowledge", "Tools", "Agents", "Topics", "Activity", "Analytics", "Channels"].map((t) => `<span class="${t === "Activity" ? "on" : ""}">${t}</span>`).join("")}</div>
+      <div style="padding:12px 24px;display:flex;align-items:center;gap:14px;font-size:14px;border-bottom:1px solid #EDEBE9;background:#fff"><span style="color:#605E5C">← Back</span><b>${o.run}</b><span id="csst" style="border-radius:12px;padding:2px 10px;font-size:12.5px;font-weight:600;background:#EFF6FC;color:#0F6CBD">In progress</span><span style="margin-left:auto;color:#605E5C">View: Transcript + Map view</span></div>
+      <div style="flex:1;display:flex;min-height:0"><div style="width:400px;border-right:1px solid #E1DFDD;padding:16px 18px;background:#fff;font-size:13.5px;overflow:hidden" id="cstr"><div style="font-weight:600;margin-bottom:10px">Transcript</div><div style="background:#F3F2F1;border-radius:6px;padding:10px 12px;margin-bottom:10px"><div style="font-size:11.5px;color:#605E5C;margin-bottom:4px">${o.payloadFrom || "Trigger payload"}</div><code style="font-size:12px;white-space:pre">${o.payload}</code></div></div>
+      <div style="flex:1;position:relative;background:#FAF9F8;background-image:radial-gradient(#E1DFDD 1px,transparent 1px);background-size:18px 18px;overflow:hidden" id="csmap">${svg}${N.map(([t, k, c, d], i) => { const [x, y] = pos(i); return `<div class="node" data-i="${i}" data-d="${d}" style="left:${x}px;top:${y}px"><div class="t"><span class="ti" style="background:${c}">${t[0]}</span>${t}<span class="st">Pending</span></div><div class="k">${k}</div></div>`; }).join("")}</div><div id="csdet" style="width:0;transition:width .5s;overflow:hidden;background:#fff;border-left:1px solid #E1DFDD"></div></div></div></div></div>`;
+  },
+  // vSphere Client: o.tree [[label, depth, color, on]], o.name, o.icon, o.tabs, o.tab, o.body, o.tasks (rows html)
+  vsphere(o) {
+    return `<div class="app vc"><div class="hd"><span style="font-size:18px">≡</span><b style="font-weight:600">vSphere Client</b><span class="srch">Search in all environments</span><span style="margin-left:auto;opacity:.85">Administrator@VSPHERE.LOCAL ▾</span><span style="opacity:.7">?</span></div>
+      <div style="flex:1;display:flex;min-height:0"><div class="tree"><div class="ti"><i class="on"></i><i></i><i></i><i></i></div>${o.tree.map(([l, d, c, on]) => `<div class="n ${on ? "on" : ""}" style="padding-left:${12 + d * 18}px"><span style="color:#8DA2AE;font-size:10px">${d < 3 ? "▾" : ""}</span><span class="ico" style="background:${c}"></span>${l}</div>`).join("")}</div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0"><div class="obj"><div class="nm"><span class="ico" style="width:22px;height:18px;background:${o.icon || "#3E86A8"}"></span><span id="vcname">${o.name}</span><span class="acts"><span>▶</span><span>■</span><span>⟳</span><span>⧉</span></span><span class="btn">ACTIONS ▾</span></div><div class="tabs">${(o.tabs || ["Summary", "Monitor", "Configure", "Permissions", "Datastores", "Networks", "Snapshots", "Updates"]).map((t) => `<span class="${t === (o.tab || "Summary") ? "on" : ""}">${t}</span>`).join("")}</div></div>
+      <div style="flex:1;min-height:0;overflow:hidden;position:relative" id="vcbody">${o.body || ""}</div>
+      <div class="rt"><div class="tb"><span class="on">Recent Tasks</span><span>Alarms</span></div><div style="overflow:hidden;flex:1"><table><thead><tr><th>Task Name</th><th>Target</th><th>Status</th><th>Details</th><th>Initiator</th><th>Queued For</th><th>Start Time</th><th>Completion Time</th></tr></thead><tbody id="vctasks">${o.tasks || ""}</tbody></table></div></div></div></div></div>`;
+  },
+  // Veeam B&R console: o.tree [[label, depth, on]], o.nav, o.body
+  veeam(o) {
+    return `<div class="app vb"><div class="tt"><span style="width:16px;height:16px;background:#00B336;border-radius:3px"></span><span>≡</span><span style="margin:0 auto;color:#444">Veeam Backup and Replication</span><span style="color:#888">— ☐ ✕</span></div>
+      <div class="rtabs"><span>≡</span><span class="on">Home</span><span>View</span>${o.ctx ? `<span style="background:#E6F6EA;color:#00862A;font-weight:600">${o.ctx}</span>` : ""}</div>
+      <div class="rib">${(o.rib || ["Backup Job", "Replication Job", "CDP Policy", "Backup Copy", "Copy Job", "Restore", "Import Backup", "Export Backup"]).map((b, i) => `<div class="${o.ribOff && o.ribOff.includes(i) ? "off" : ""}"><i></i>${b}</div>`).join("")}</div>
+      <div style="flex:1;display:flex;min-height:0"><div class="left"><div class="tr">${o.tree.map(([l, d, on]) => `<div class="${on ? "on" : ""}" style="padding-left:${12 + d * 16}px">${d < 2 ? "▾ " : ""}${l}</div>`).join("")}</div><div class="nv">${["Home", "Inventory", "Backup Infrastructure", "Storage Infrastructure", "Tape Infrastructure", "Files", "History"].map((n) => `<div class="${n === (o.nav || "Home") ? "on" : ""}"><i></i>${n}</div>`).join("")}</div></div>
+      <div style="flex:1;min-width:0;position:relative;overflow:hidden" id="vbbody">${o.body || ""}</div></div>
+      <div style="height:26px;border-top:1px solid #D9D9D9;font-size:12px;color:#555;display:flex;align-items:center;padding:0 12px">${o.status || "1 job selected"}</div></div>`;
+  },
+  // Microsoft admin portals: o.product, o.nav [[label, kind sec|sub|'' , on]], o.body
+  ms(o) {
+    return `<div class="app ms"><div class="hd"><span class="waf"></span><b style="font-weight:600">${o.product}</b><span class="srch">Search</span><span style="margin-left:auto;display:flex;gap:16px;align-items:center;opacity:.9"><span>🔔</span><span>⚙</span><span>?</span><span style="width:30px;height:30px;border-radius:50%;background:#8764B8;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">${o.me || "SA"}</span></span></div>
+      <div style="flex:1;display:flex;min-height:0"><div class="nav">${o.nav.map(([l, k, on]) => `<div class="${k || ""} ${on ? "on" : ""}">${k === "sub" ? "" : "<i></i>"}${l}</div>`).join("")}</div>
+      <div style="flex:1;min-width:0;position:relative;overflow:hidden;display:flex;flex-direction:column" id="msbody">${o.body || ""}</div></div></div>`;
+  },
+  // generic web portal: o.brand, o.color, o.links, o.right, o.body
+  web(o) {
+    return `<div class="app wp"><div class="hd" style="background:${o.color || "#2D3142"}"><b style="font-size:18px">${o.brand}</b>${(o.links || []).map((l) => `<span style="opacity:.8">${l}</span>`).join("")}<span style="margin-left:auto;opacity:.85">${o.right || ""}</span></div><div style="flex:1;min-height:0;position:relative;overflow:hidden" id="wpbody">${o.body || ""}</div></div>`;
+  },
+  // Outlook on the web: o.folders, o.list [[from, subj, prev, on]], o.body
+  outlook(o) {
+    return `<div class="app ol"><div class="hd"><span class="waf" style="width:18px;height:18px;background-image:radial-gradient(#fff 1.4px,transparent 1.6px);background-size:6px 6px"></span><b style="font-weight:600">Outlook</b><span style="margin-left:80px;width:480px;height:30px;border-radius:4px;background:#fff;color:#707070;display:flex;align-items:center;padding:0 12px;font-size:13px">Search</span><span style="margin-left:auto;width:30px;height:30px;border-radius:50%;background:#C4314B;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">${o.me || "AN"}</span></div>
+      <div class="rib">${(o.rib || ["New mail", "Delete", "Archive", "Report", "Sweep", "Move to", "Reply all"]).map((b) => `<span class="${b === o.ribOn ? "on" : ""}" ${b === "Report" ? 'id="olreport"' : ""}>${b}${b === "Report" ? " ▾" : ""}</span>`).join("")}</div>
+      <div style="flex:1;display:flex;min-height:0"><div style="width:220px;background:#fff;border-right:1px solid #E0E0E0;padding:10px 0;font-size:13.5px">${(o.folders || ["Inbox", "Junk Email", "Drafts", "Sent Items", "Deleted Items", "Archive"]).map((f, i) => `<div style="padding:7px 18px;${i === 0 ? "background:#EBF3FC;font-weight:600" : ""}">${f}</div>`).join("")}</div>
+      <div style="width:420px;background:#fff;border-right:1px solid #E0E0E0;font-size:13.5px" id="ollist">${(o.list || []).map(([f, s, p, on], i) => `<div id="olm${i}" style="padding:10px 16px;border-bottom:1px solid #F0F0F0;${on ? "background:#EBF3FC;border-left:3px solid #0F6CBD" : ""}"><div style="font-weight:${on ? 700 : 600}">${f}</div><div style="color:${on ? "#0F6CBD" : "#242424"}">${s}</div><div style="color:#616161;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p}</div></div>`).join("")}</div>
+      <div style="flex:1;min-width:0;position:relative;overflow:hidden;background:#fff" id="olbody">${o.body || ""}</div></div></div>`;
+  },
+};
+</script></body></html>

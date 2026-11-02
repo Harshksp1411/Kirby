@@ -1,0 +1,15 @@
+{
+ "hook": "Disks don't fail loudly. They fill up quietly. Until the morning nobody can save a file.",
+ "intro": "Here is how Mova iO fixes a full disk, days before it fills.",
+ "s1": "In Ops Ramp, nothing is down yet. But the shared drive on the Hyderabad file server has climbed from sixty-two to eighty-five percent in a month, and the forecast says it hits ninety-five percent in five days.",
+ "s2": "Mova iO's capacity agent looks for the cause. A new E R P export job has added three hundred and ten gigabytes in three weeks. The datastore has plenty of room, so it recommends adding two hundred and fifty gigabytes at lunchtime, when the disk is quietest.",
+ "s3": "It raises a standard change in ServiceNow from a pre-approved template, with the window, the conflict check, and the implementation plan already filled in.",
+ "s4": "The infrastructure owner gets a heads-up in Teams, with the option to stop it. She's happy, so it stays on the schedule.",
+ "s5": "At one o'clock, the agent runs the change. Every step is a tool call you can inspect: the growth check, the datastore check, the Key Vault secret, the disk extension in v Center, and the volume extension in Windows.",
+ "s6": "In v Center, the disk grows from one terabyte to one and a quarter, online. Nobody's file share disconnects.",
+ "s7": "Back in Ops Ramp, usage drops to sixty-eight percent, and the forecast moves out to February.",
+ "s8": "The change closes itself as successful, with the evidence in the notes, and Finance has a retention review to stop the exports growing forever.",
+ "close": "Caught five days before it filled. Fixed online, in a pre-approved window. Nobody lost a file, and nobody was paged.",
+ "tag": "Capacity problems, prevented by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

@@ -1,0 +1,15 @@
+{
+ "hook": "One email. One click. One password typed into the wrong page.",
+ "stat1": "Sixty percent of breaches involve the human element.",
+ "intro": "Here is how Mova iO turns one reported email into a contained campaign.",
+ "s1": "Anita in Finance gets an urgent request to confirm new bank details. It doesn't feel right, so she reports it as phishing, straight from Outlook.",
+ "s2": "In Microsoft Defender, the report becomes an incident. Mova iO's S O C agent pulls in every message like it, and the incident grows into a campaign: twenty-three mailboxes, raised to high severity.",
+ "s3": "The attack story shows who received it and who clicked. Two people clicked. One of them, Sneha, typed her password, and three minutes later, an attacker tried to sign in with it. Multi-factor stopped them. The agent writes its findings and a recommendation into the incident.",
+ "s4": "Removing email from twenty-three mailboxes and resetting an account needs a human decision. The S O C analyst reviews it in Teams, and approves.",
+ "s5": "In Copilot Studio, every step is a tool call you can inspect: the email cluster, the U R L detonation, the click hunt, the sign-in check, the approval, the purge, the blocks, and the account actions.",
+ "s6": "Back in Defender, every entity is remediated. All twenty-three copies are gone, the sender and U R L are blocked, and Sneha's sessions are revoked, with a password reset at her next sign-in.",
+ "s7": "And Anita hears back within minutes, so she knows reporting was worth it.",
+ "close": "Reported at ten oh six. Contained by ten twelve. Every copy removed before anyone else clicked, and the attacker locked out.",
+ "tag": "Phishing, contained by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}

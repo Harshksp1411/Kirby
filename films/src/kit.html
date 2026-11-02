@@ -214,7 +214,7 @@ const D = window.D = {
   win(on) { W().classList.toggle("on", on); },
   // ---------- camera, spotlight, cursor (selectors resolve inside the app window)
   setCam(k, tx, ty) { Object.assign(cam, { k, tx, ty }); $("#cam").style.transform = `translate(${tx}px,${ty}px) scale(${k})`; },
-  local(el) { const r = el.getBoundingClientRect(); return { x: (r.x - cam.tx) / cam.k, y: (r.y - cam.ty) / cam.k, w: r.width / cam.k, h: r.height / cam.k }; },
+  local(el) { const r = el.getBoundingClientRect(), w = W().getBoundingClientRect(), s = w.width / 1640; return { x: 140 + (r.x - w.x) / s, y: 84 + (r.y - w.y) / s, w: r.width / s, h: r.height / s }; },
   stage(l) { return { x: l.x * cam.k + cam.tx, y: l.y * cam.k + cam.ty, w: l.w * cam.k, h: l.h * cam.k }; },
   el(sel) { return typeof sel === "string" ? $(sel, W()) : sel; },
   focus(sel, o = {}) {

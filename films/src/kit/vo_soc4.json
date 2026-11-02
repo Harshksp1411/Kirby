@@ -1,0 +1,16 @@
+{
+ "hook": "One forty-seven, on a Sunday morning. Someone becomes an admin. Nobody asked for it.",
+ "stat1": "On average, it takes two hundred and forty-one days to identify and contain a breach.",
+ "stat2": "And the average breach costs four point four four million dollars.",
+ "intro": "Here is how Mova iO reverses an unapproved admin grant, in six minutes, at two in the morning.",
+ "s1": "A Microsoft Sentinel analytics rule fires in the Defender portal: a privileged role was assigned outside Privileged Identity Management.",
+ "s2": "The Entra audit log shows the detail. An admin account gave a contractor permanent Privileged Role Administrator rights, the role that can grant every other role.",
+ "s3": "Mova iO checks what a person would check. There's no approved change in ServiceNow. The contractor's contract ended two weeks ago. The admin is on leave. And his sign-in came from a rented server with an anomalous token. The new role hasn't been used yet.",
+ "s4": "The identity on-call gets an urgent card in Teams, with everything she needs to decide. She approves from her phone.",
+ "s5": "In Copilot Studio, every step is a tool call you can inspect: the change search, the contract check, the calendar, the sign-in risk, the approval, and every containment action.",
+ "s6": "In P I M, the assignment is gone. The contractor account is disabled, both accounts' sessions are revoked, and the attacker's next attempt is blocked.",
+ "s7": "The security incident in ServiceNow records it all, with follow-ups for Monday: a review of every permanent admin role, and fourteen leftover contractor accounts to remove.",
+ "close": "Granted at one forty-seven. Reversed at one fifty-three. A human decided, from their phone, in two minutes.",
+ "tag": "Privilege escalation, reversed by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}
