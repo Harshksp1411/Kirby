@@ -31128,6 +31128,7 @@ const KXD = (() => {
     const st = document.createElement("style");
     st.textContent = `
 [data-kx]{cursor:pointer}
+[data-kx-sev]:hover{outline:2px solid ${C.mag};outline-offset:2px;border-radius:4px}
 [data-kx]:not([data-kx-tile]):hover{text-decoration:underline dotted ${C.mag};text-underline-offset:3px;text-decoration-thickness:1.5px}
 [data-kx-tile]{position:relative;transition:box-shadow .15s}
 [data-kx-tile]:hover{box-shadow:0 0 0 2px ${C.mag}!important}
@@ -31166,12 +31167,13 @@ const KXD = (() => {
     const scrim = document.createElement("div"); scrim.id = "kxd-scrim"; scrim.style.display = "none";
     root = document.createElement("aside"); root.id = "kxd"; root.setAttribute("aria-label", "Drill down");
     document.body.append(scrim, root);
-    scrim.addEventListener("click", close);
+    scrim.addEventListener("click", () => { if (Date.now() - openedAt > 450) close(); });
     root.addEventListener("click", onPanelClick);
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && stack.length) { e.stopPropagation(); close(); } }, true);
   }
+  let openedAt = 0;
   function open(view, fresh) {
-    ensure();
+    ensure(); openedAt = Date.now();
     if (fresh) stack = [];
     stack.push(view); render();
     const scrim = document.getElementById("kxd-scrim"); scrim.style.display = "block";
@@ -31417,9 +31419,46 @@ const KXD = (() => {
       const m = tx.match(/^#?(\d{4})\b|#(\d{4})\b/); if (m && tx.length < 70) { const id = m[1] || m[2]; if (site(id)) { tag(el, { t: "site", id }); continue; } }
       for (const [k, id] of idx) if (k.length > 6 && tx.startsWith(k) && tx.length < k.length + 40) { tag(el, { t: "site", id }); break; }
     }
+    // anything shown in red or amber (down, degraded, failed, critical) drills to its root cause
+    for (const el of main.querySelectorAll("span,b,strong,td,div,p")) {
+      if (el.dataset.kx || el.closest("#kxd") || el.closest("nav,aside,[role=dialog]") || el.children.length > 2 || el.querySelector("div")) continue;
+      const tx = (el.textContent || "").trim(); if (!tx || tx.length > 80) continue;
+      const cs = getComputedStyle(el), sev = SEV(cs.color) || (el.offsetWidth < 220 ? SEV(cs.backgroundColor) : null); if (!sev) continue;
+      tag(el, contextView(el, sev)); el.dataset.kxSev = sev; el.dataset.kxForce = "1";
+    }
+    for (const g of main.querySelectorAll("svg rect, svg circle, svg path")) {
+      if (g.dataset.kx) continue; const f = g.getAttribute("fill") || getComputedStyle(g).fill; const sev = SEV(f); if (!sev) continue;
+      const bb = g.getBBox ? g.getBBox() : { width: 0, height: 0 }; if (bb.width > 60 && bb.height > 60) continue;
+      tag(g, contextView(g, sev, true)); g.dataset.kxForce = "1"; g.style.cursor = "pointer";
+    }
     // header status counts beside "All sites" (titles like "6 down"), and the open-incidents count
     document.querySelectorAll('span[title$=" healthy"],span[title$=" degraded"],span[title$=" down"]').forEach((d) => { const st = d.title.split(" ").pop(); tag(d, { t: "sites", status: st, label: ST[st][0] + " sites" }); d.dataset.kxForce = "1"; });
     document.querySelectorAll('button[title="Health of the sites in this view"] span').forEach((d) => { const tx = (d.textContent || "").trim(); if (/open incidents$/.test(tx)) { tag(d, { t: "incidents", f: "open", label: "Open incidents" }); d.dataset.kxForce = "1"; } else if (/^\d+ sites$/.test(tx)) { tag(d, { t: "sites", status: "all", label: "All sites" }); d.dataset.kxForce = "1"; } });
+  }
+
+  // colour -> severity: reds are down/critical, ambers are degraded/warning
+  const SEV = (c) => { const m = String(c || "").match(/(\d+),\s*(\d+),\s*(\d+)/); let r, g, b; if (m) { [r, g, b] = [+m[1], +m[2], +m[3]]; } else { const h = String(c || "").match(/^#([0-9a-f]{6})$/i); if (!h) return null; r = parseInt(h[1].slice(0, 2), 16); g = parseInt(h[1].slice(2, 4), 16); b = parseInt(h[1].slice(4), 16); }
+    if (r > 170 && g < 110 && b < 100 && r - g > 90) return "bad"; if (r > 200 && g > 110 && g < 175 && b < 80) return "warn"; return null; };
+  // find what a coloured element is about: the nearest site, incident or device in its row or card
+  function contextView(el, sev, svg) {
+    let e = svg ? el.closest("svg") : el;
+    for (let k = 0; k < 7 && e; k++, e = e.parentElement) {
+      const t = (e.textContent || ""); if (t.length > 600) break;
+      const inc = t.match(/INC\d{7}/); if (inc) return { t: "incident", n: inc[0] };
+      const dv = t.match(/(edge|sw|srv|ilo|vm|nas|dvr|ap|ws|img|prn)-\d{4}(?:-(?:\d{2}|app))?/); if (dv) return { t: "device", id: dv[0] };
+      const idx = siteIndex(); for (const [k2, id] of idx) if (k2.length > 6 && t.includes(k2)) return { t: "site", id };
+      const m = t.match(/#(\d{4})\b/); if (m && site(m[1])) return { t: "site", id: m[1] };
+      const tl = e.getAttribute && (e.getAttribute("title") || ""); if (/critical|error/i.test(tl)) return { t: "alerts", sev: "critical", label: "Critical alerts" };
+    }
+    return sev === "bad" ? { t: "sites", status: "down", label: "Sites that are down" } : { t: "sites", status: "degraded", label: "Degraded sites" };
+  }
+  // double-click anything: drill from the row or card it sits in
+  function onDblClick(e) {
+    if (e.target.closest("#kxd,#kxd-scrim") || e.target.closest("input,textarea,select")) return;
+    const tagged = e.target.closest("[data-kx]"); let v = tagged ? JSON.parse(tagged.dataset.kx) : null;
+    if (!v) { const sev = SEV(getComputedStyle(e.target).color) || "bad"; v = contextView(e.target, sev); }
+    e.preventDefault(); e.stopPropagation(); const sel = window.getSelection && window.getSelection(); sel && sel.removeAllRanges && sel.removeAllRanges();
+    open(v, true);
   }
   function onDocClick(e) {
     const el = e.target.closest("[data-kx]"); if (!el || el.closest("#kxd")) return;
@@ -31429,7 +31468,7 @@ const KXD = (() => {
   }
   function start() {
     ensure();
-    document.addEventListener("click", onDocClick, true);
+    document.addEventListener("click", onDocClick, true); document.addEventListener("dblclick", onDblClick, true);
     setInterval(scan, 900); setTimeout(scan, 300);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else setTimeout(start, 0);
