@@ -2,7 +2,8 @@
 
 Short product films in the Movate style: a hook, sourced stats, the tools involved, numbered steps over live footage of the Intelligent Operations Hub, outcomes, end card. Voiceover throughout.
 
-- `NOC_Carrier_Outage_Mova_iO.mp4`: NOC film 1, current cut. Designed screens (no hub footage), Mova iO agents by name, integration map, human in the loop, voiceover. Generic for any client. Built from `studio.html` + `noc1m.js` + `vo_noc1m.json`.
+- `NOC_Carrier_Outage_Real_Workflow.mp4`: NOC film 1, current cut (2:32). The outage worked live through faithful recreations of the real tool screens: OpsRamp alerts and inference, ServiceNow incident with Mova iO work notes, Teams approval card, Copilot Studio activity map, SD-WAN orchestrator path switch, carrier portal ticket, then resolution. Voiceover and music. Sample data, no vendor logos. Built from `src/apps.html` + `src/noc1r.js` + `src/vo_noc1r.json`.
+- `NOC_Carrier_Outage_Mova_iO.mp4`: NOC film 1, designed-screens cut. Designed screens (no hub footage), Mova iO agents by name, integration map, human in the loop, voiceover. Generic for any client. Built from `studio.html` + `noc1m.js` + `vo_noc1m.json`.
 - `NOC_Carrier_Outage_Response.mp4`: earlier generic cut recorded from the hub. generic, for any client. A carrier degradation across five offices handled end to end. Runs on the brand-free hub build (no client name; Movate logo in the header).
 - `Kirby_NOC_Network_Agent.mp4`: the earlier Kirby-branded cut, no voiceover.
 

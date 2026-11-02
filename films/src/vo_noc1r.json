@@ -1,0 +1,17 @@
+{
+ "hook": "Every fibre cut. Every flapping circuit. Every alert at two in the morning.",
+ "stat1": "For more than ninety percent of mid-size and large enterprises, one hour of downtime now costs over three hundred thousand dollars.",
+ "stat2": "And thirty percent of I T service outages start in the network.",
+ "intro": "Here is how Mova iO handles a carrier outage, end to end, inside the tools your teams already use.",
+ "s1": "It starts in Ops Ramp. Critical alerts arrive from five sales offices on the same carrier: packet loss, degraded links, and rising latency.",
+ "s2": "Mova iO's event correlator groups them, together with four calls to the service desk, into a single inference, flags the root-cause alert, and opens one incident in ServiceNow.",
+ "s3": "In ServiceNow, the incident arrives already enriched. The triage orchestrator writes its findings to the work notes: the carrier circuit, at ninety-five percent confidence, and everything it ruled out.",
+ "s4": "The NOC lead gets an approval card in Microsoft Teams. The runbook is pre-approved for regional carrier events, so it would run in ten seconds anyway. She approves it now.",
+ "s5": "Behind the card is the Mova iO NOC agent, built in Copilot Studio. Every step is a tool call you can inspect: the incident, the correlated alerts, the runbook search, the approval, the Key Vault secret, and the S D WAN change, with its exact inputs and outputs.",
+ "s6": "In the S D WAN orchestrator, the business policy moves each office to its four G backup. Latency falls from four hundred and ten milliseconds to forty-two.",
+ "s7": "A vendor agent raises one ticket with the carrier for the whole segment, with loss graphs, traceroutes and circuit I Ds attached. The carrier acknowledges within minutes.",
+ "s8": "Site contacts get a plain-language update in Teams. And in ServiceNow, the incident is resolved with full notes, and a knowledge article is drafted for next time.",
+ "close": "One incident instead of fourteen signals. Five offices back online in under a minute. One carrier ticket, with the evidence attached.",
+ "tag": "Carrier outages, resolved by Mova iO agents. With people in control.",
+ "end": "Movate. Your applied A I partner."
+}
