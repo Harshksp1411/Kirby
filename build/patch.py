@@ -184,6 +184,10 @@ i = s.find('{ id: "S1", parts'); j = s.find('{ id: "S2"', i)
 s = s[:i] + _re.sub(r'\b7\b', '5', s[i:j]).replace('Seven', 'Five') + s[j:]
 i = s.find('function dee()'); j = s.find('function kee()', i)
 s = s[:i] + _re.sub(r'\b14\b', '10', _re.sub(r'\b7\b', '5', s[i:j])) + s[j:]
+
+# no Site Cutover anywhere: demos page group and the left navigation
+rep_exact(', { id: "ciab", name: "Clinic-in-a-Box", icon: "PackageOpen", note: "New and acquired clinics" }]', ']')
+rep_exact('{ id: "ciab", label: "Clinic-in-a-Box", icon: "PackageOpen" }, ', '')
 # business service tiles at Kirby scale
 rep_exact('return 9.4 + qe("svE", s, 40) * 0.5 +', 'return 2.2 + qe("svE", s, 40) * 0.3 +')
 rep_exact('return Math.max(20, 182 * ha(n) + qe("svP", s, 20) * 14);', 'return Math.max(6, 11 * ha(n) + qe("svP", s, 20) * 3);')
