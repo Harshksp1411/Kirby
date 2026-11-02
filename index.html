@@ -31625,8 +31625,9 @@ const KCC = (() => {
     return card("kcc-shift", "On shift now", "Owners by tower · handover at 14:00 IST", rows + `<div class="kcc-muted" style="margin:12px 0 4px">Problems under investigation</div>` + prb);
   }
   function renderCC(root) {
-    root.innerHTML = `<div class="kcc-h2"><b>Operations insight</b><span>noise, speed, coverage and what is coming</span></div>
-      <div class="kcc-grid kcc-g3">${funnel()}${mttx()}${agents()}</div>
+    root.innerHTML = `<div class="kcc-h2"><b>Operations insight</b><span>noise, speed and what the estate is made of</span></div>
+      <div class="kcc-grid kcc-g3">${funnel()}${mttx()}${estInventory()}</div>
+      ${renderEstate()}
       ${matrix()}
       <div class="kcc-grid kcc-g21">${changes()}${sla()}</div>
       <div class="kcc-grid kcc-g3">${capacity()}${hygiene()}${shift()}</div>
@@ -31923,6 +31924,141 @@ const KCC = (() => {
     last.k = ""; tick();
   }, true);
 
+  // ================= ESTATE GRAPHS (Command Center) and LIVE ESTATE TELEMETRY (Live Operations) =================
+  const REG = () => [...new Set(S().clinics.map((c) => c.region))];
+  const RCOL = ["#8E4A86", "#E15AA5", "#F39237", "#D9A21B", "#4E3047", "#B83A80"];
+  const bwOf = (c) => { const b = String((c.primaryCircuit && c.primaryCircuit.bandwidth) || "100M"); return (parseFloat(b) || 100) * (/G/i.test(b) ? 1000 : 1); };
+  const wave = (seed, t, base, amp, period, noise = 0.15, step = 10000) => { const ph = rnd(seed)() * 6.28, n = rnd(seed + Math.floor(t / step))(); return base + amp * Math.sin((2 * Math.PI * t) / period + ph) + (n - 0.5) * 2 * noise * base; };
+  const busy = (c, t) => { const h = new Date(t).getHours() + new Date(t).getMinutes() / 60, o = parseInt((c.hours && c.hours.open) || "08"), cl = parseInt((c.hours && c.hours.close) || "18"); const ramp = (x) => Math.max(0, Math.min(1, x)); return 0.18 + 0.82 * ramp(h - o + 0.5) * ramp(cl - h + 0.5); };
+  const siteUtil = (c, t) => { if (c.status === "down" && ["carrier-down", "edge-hw", "power"].includes(c.issue && c.issue.kind) && t > S().now - 30 * 6e4) return 0; return Math.max(0.03, Math.min(0.97, wave("u" + c.id, t, 0.42 * busy(c, t) + 0.08, 0.12, 3600e3 * 3, 0.12))); };
+  const siteLat = (c, t) => { const k = c.issue && c.issue.kind, base = 28 + (rnd("lb" + c.id)() * 30), recent = t > S().now - 30 * 6e4; if (c.status === "down" && ["carrier-down", "edge-hw", "power"].includes(k) && recent) return null; return Math.max(8, wave("l" + c.id, t, base * (k === "onlte" && recent ? 1.9 : k === "jitter" && recent ? 1.6 : 1), 6, 1800e3, 0.08)); };
+  const siteLoss = (c, t) => { const k = c.issue && c.issue.kind, recent = t > S().now - 30 * 6e4; return Math.max(0, wave("p" + c.id, t, k === "jitter" && recent ? 1.8 : k === "onlte" && recent ? 0.9 : 0.12, 0.05, 900e3, 0.6)); };
+  const lineChart = (series, o) => {
+    const W = o.w || 560, H = o.h || 150, n = series[0].v.length, all = series.flatMap((s) => s.v).filter((x) => x != null), max = o.max || Math.max(...all) * 1.1 || 1, min = o.min || 0;
+    const x = (i) => (i / (n - 1)) * W, y = (v) => H - ((v - min) / (max - min)) * H;
+    let s = `<svg viewBox="0 -12 ${W} ${H + 28}" style="width:100%;height:auto;display:block">`;
+    for (let g = 0; g <= 3; g++) { const v = min + ((max - min) * g) / 3; s += `<line x1="0" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="#F0ECEF"/><text x="2" y="${y(v) - 3}" font-size="10" fill="${C.muted}">${o.fmt ? o.fmt(v) : Math.round(v)}</text>`; }
+    if (o.cap) s += `<line x1="0" x2="${W}" y1="${y(o.cap)}" y2="${y(o.cap)}" stroke="${C.bad}" stroke-dasharray="4 4"/><text x="${W - 2}" y="${y(o.cap) - 3}" font-size="10" text-anchor="end" fill="${C.bad}">${o.capLabel || ""}</text>`;
+    if (o.stack) { let acc = new Array(n).fill(0); series.forEach((sr) => { const lo = acc.slice(); acc = acc.map((a, i) => a + (sr.v[i] || 0)); s += `<path d="${acc.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")} ${lo.map((v, i) => `L${x(n - 1 - i).toFixed(1)} ${y(lo[n - 1 - i]).toFixed(1)}`).join(" ")} Z" fill="${sr.c}" opacity=".85"><title>${esc(sr.n)}</title></path>`; }); }
+    else series.forEach((sr) => { let d = "", pen = false; sr.v.forEach((v, i) => { if (v == null) { pen = false; return; } d += `${pen ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)} `; pen = true; }); s += `${sr.fill ? `<path d="${d} L${W} ${H} L0 ${H} Z" fill="${sr.c}18"/>` : ""}<path d="${d}" fill="none" stroke="${sr.c}" stroke-width="${sr.w || 1.8}"><title>${esc(sr.n)}</title></path>`; const lv = sr.v[n - 1]; if (o.dots && lv != null) s += `<circle cx="${W}" cy="${y(lv)}" r="3.5" fill="${sr.c}"/>`; });
+    (o.ticks || []).forEach(([i, t]) => (s += `<text x="${x(i)}" y="${H + 14}" font-size="10" fill="${C.muted}" text-anchor="${i === 0 ? "start" : i >= n - 1 ? "end" : "middle"}">${t}</text>`));
+    return s + `</svg>`;
+  };
+  const legend = (items) => `<div class="kcc-legend" style="margin-top:8px">${items.map(([n, c, v]) => `<span><i style="background:${c}"></i>${esc(n)}${v != null ? ` <b style="color:${C.ink}">${v}</b>` : ""}</span>`).join("")}</div>`;
+  const donut = (parts, size = 150, label = "", sub = "") => { const tot = parts.reduce((a, p) => a + p[1], 0) || 1, R = size / 2 - 10, cx = size / 2; let a0 = -Math.PI / 2, s = `<svg viewBox="0 0 ${size} ${size}" style="width:${size}px;flex:none">`; parts.forEach(([n, v, col]) => { const a1 = a0 + (v / tot) * Math.PI * 2, lg = a1 - a0 > Math.PI ? 1 : 0; s += `<path d="M${cx + R * Math.cos(a0)} ${cx + R * Math.sin(a0)} A${R} ${R} 0 ${lg} 1 ${cx + R * Math.cos(a1)} ${cx + R * Math.sin(a1)}" fill="none" stroke="${col}" stroke-width="18"><title>${esc(n)}: ${v}</title></path>`; a0 = a1; }); return s + `<text x="${cx}" y="${cx + 2}" text-anchor="middle" font-size="22" font-weight="700" fill="${C.ink}">${label}</text><text x="${cx}" y="${cx + 20}" text-anchor="middle" font-size="11" fill="${C.muted}">${sub}</text></svg>`; };
+  const hours24 = (now) => Array.from({ length: 25 }, (_, i) => now - (24 - i) * 3600e3);
+
+  // ----- Command Center estate
+  function estInventory() {
+    const cl = S().clinics, cnt = {}; cl.forEach((c) => devices(c).forEach((d) => (cnt[d.t] = (cnt[d.t] || 0) + 1)));
+    const pcs = cl.reduce((a, c) => a + (c.wsCount || 20) + Math.round((c.users || 100) * 0.6), 0), users = cl.reduce((a, c) => a + (c.users || 0), 0);
+    const parts = [["Access points", cnt.ap, RCOL[0]], ["Switches", cnt.sw, RCOL[1]], ["SD-WAN edges", cnt.edge, RCOL[2]], ["Servers, iLO, VMs", (cnt.srv || 0) + (cnt.ilo || 0) + (cnt.vm || 0), RCOL[3]], ["NAS and UPS", (cnt.nas || 0) + (cnt.ups || 0), RCOL[4]], ["Printers", cnt.prn, RCOL[5]]];
+    const infra = parts.reduce((a, p) => a + p[1], 0);
+    const kinds = {}; cl.forEach((c) => (kinds[c.kind] = (kinds[c.kind] || 0) + 1));
+    const body = `<div style="display:flex;gap:16px;align-items:center">${donut(parts, 150, infra, "infra devices")}<div style="flex:1">${parts.map(([n, v, col]) => `<div class="kcc-row"><i style="width:10px;height:10px;border-radius:3px;background:${col};flex:none"></i><span style="flex:1">${n}</span><b class="kcc-num">${v}</b></div>`).join("")}</div></div>
+      <div class="kcc-kpis" style="margin-top:12px;margin-bottom:0"><div class="kcc-kpi"><b>${cl.length}</b><span>sites · ${Object.entries(kinds).map(([k, v]) => v + " " + k.toLowerCase() + (v > 1 && !/s$/.test(k) ? "s" : "")).join(", ")}</span></div><div class="kcc-kpi"><b>${pcs.toLocaleString()}</b><span>PCs and laptops</span></div><div class="kcc-kpi"><b>${users.toLocaleString()}</b><span>people on site</span></div></div>`;
+    return card("kcc-inv", "Estate inventory", "Everything monitored, from the CMDB and OpsRamp", body);
+  }
+  function estWan() {
+    const now = S().now, hs = hours24(now), regs = REG();
+    const series = regs.map((rg, i) => ({ n: rg, c: RCOL[i % RCOL.length], v: hs.map((t) => S().clinics.filter((c) => c.region === rg).reduce((a, c) => a + bwOf(c) * siteUtil(c, t), 0)) }));
+    const cap = S().clinics.reduce((a, c) => a + bwOf(c), 0), nowTot = series.reduce((a, s) => a + s.v[24], 0), peak = Math.max(...hs.map((_, i) => series.reduce((a, s) => a + s.v[i], 0)));
+    const body = `<div class="kcc-kpis"><div class="kcc-kpi"><b>${(nowTot / 1000).toFixed(2)} Gbps</b><span>WAN traffic now</span></div><div class="kcc-kpi"><b>${(peak / 1000).toFixed(2)} Gbps</b><span>peak, 24 h</span></div><div class="kcc-kpi"><b>${(cap / 1000).toFixed(1)} Gbps</b><span>contracted, ${S().clinics.length} primary circuits</span></div></div>
+      ${lineChart(series.map((sr) => { const capR = S().clinics.filter((c) => c.region === sr.n).reduce((x, c) => x + bwOf(c), 0) || 1; return { n: sr.n, c: sr.c, v: sr.v.map((v) => (v / capR) * 100) }; }), { h: 160, max: 100, dots: 1, fmt: (v) => Math.round(v) + "%", cap: 80, capLabel: "80% planning threshold", ticks: [[0, hm(hs[0])], [6, hm(hs[6])], [12, hm(hs[12])], [18, hm(hs[18])], [24, "now"]] })}${legend(series.map((sr) => { const capR = S().clinics.filter((c) => c.region === sr.n).reduce((x, c) => x + bwOf(c), 0) || 1; return [sr.n, sr.c, Math.round((sr.v[24] / capR) * 100) + "%"]; }))}`;
+    return card("kcc-wan24", "WAN use by region", "Share of contracted capacity in use, primary circuits, last 24 hours · SD-WAN", body);
+  }
+  function estCarriers() {
+    const cl = S().clinics, by = {}; cl.forEach((c) => { const k = c.carrier || "Other"; (by[k] = by[k] || []).push(c); });
+    const rows = Object.entries(by).sort((a, b) => b[1].length - a[1].length).map(([k, cs]) => { const r = rnd("car" + k), av = 99.5 + r() * 0.48 - cs.filter((c) => c.status === "down" && ["carrier-down"].includes(c.issue && c.issue.kind)).length * 0.3, lat = cs.map((c) => siteLat(c, S().now)).filter((x) => x != null), al = lat.length ? lat.reduce((a, b) => a + b, 0) / lat.length : 0, bad = cs.filter((c) => ["carrier-down", "onlte", "jitter"].includes(c.issue && c.issue.kind)).length; return `<tr><td><b>${esc(k)}</b></td><td class="kcc-num">${cs.length}</td><td class="kcc-num">${cs.reduce((a, c) => a + bwOf(c), 0)} Mbps</td><td style="width:150px"><div style="display:flex;gap:6px;align-items:center">${bar((av - 99) * 100, av >= 99.9 ? C.ok : av >= 99.5 ? C.warn : C.bad, 6)}<span class="kcc-num">${av.toFixed(2)}%</span></div></td><td class="kcc-num">${lat.length ? Math.round(al) + " ms" : "–"}</td><td>${bad ? pill(bad + " affected", C.warn) : pill("clear", C.ok)}</td></tr>`; }).join("");
+    return card("kcc-car", "Circuits by carrier", "Availability over 30 days, latency now, sites affected", `<table class="kcc-dt"><thead><tr><th>Carrier</th><th>Sites</th><th>Capacity</th><th>Availability</th><th>Latency</th><th>Now</th></tr></thead><tbody>${rows}</tbody></table>`);
+  }
+  function estLatency() {
+    const now = S().now, rows = S().clinics.map((c) => ({ c, v: siteLat(c, now), l: siteLoss(c, now) })).sort((a, b) => (b.v == null ? 999 : b.v) - (a.v == null ? 999 : a.v)).slice(0, 10), max = Math.max(...rows.map((r) => r.v || 0), 120);
+    return card("kcc-lat", "Latency to hub, worst 10 sites", "Active path, now · packet loss alongside", rows.map(({ c, v, l }) => { const col = v == null ? C.bad : v > 120 ? C.bad : v > 70 ? C.warn : C.ok; return `<div class="kcc-row kcc-click" ${kx({ t: "site", id: c.id })}><span style="width:150px;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><b>${c.code}</b> <span class="kcc-muted">${esc(c.short || c.name)}</span></span>${bar(v == null ? 100 : (v / max) * 100, col, 10)}<b class="kcc-num" style="width:62px;text-align:right;color:${col}">${v == null ? "down" : Math.round(v) + " ms"}</b><span class="kcc-num kcc-muted" style="width:48px;text-align:right">${v == null ? "–" : l.toFixed(2) + "%"}</span></div>`; }).join(""));
+  }
+  function estCompute() {
+    const now = S().now, hs = hours24(now);
+    const cpuA = hs.map((t) => wave("avs-cpu", t, 46, 12, 86400e3, 0.06)), memA = hs.map((t) => wave("avs-mem", t, 68, 4, 86400e3, 0.02)), cpuS = hs.map((t) => S().clinics.reduce((a, c) => a + wave("sc" + c.id, t, 18 + 30 * busy(c, t), 6, 7200e3, 0.1), 0) / S().clinics.length);
+    const ds = [["AVS vSAN datastore", 71], ["HQ-DS-01", 64], ["HYD-DS-02", 81], ["RAK-DS-01", 58], ["HAR-DS-01", 39]];
+    const vms = S().clinics.length * 4 + 212;
+    const body = `<div class="kcc-kpis"><div class="kcc-kpi"><b>${S().clinics.length * 2 + 16}</b><span>ESXi hosts</span></div><div class="kcc-kpi"><b>${vms}</b><span>virtual machines</span></div><div class="kcc-kpi"><b>${Math.round(cpuA[24])}%</b><span>AVS cluster CPU now</span></div></div>
+      ${lineChart([{ n: "AVS cluster CPU", c: RCOL[0], v: cpuA, fill: 1 }, { n: "AVS cluster memory", c: RCOL[2], v: memA }, { n: "Site hosts CPU (avg)", c: RCOL[1], v: cpuS }], { h: 130, max: 100, fmt: (v) => Math.round(v) + "%", ticks: [[0, "-24 h"], [12, "-12 h"], [24, "now"]], dots: 1 })}${legend([["AVS cluster CPU", RCOL[0]], ["AVS cluster memory", RCOL[2]], ["Site hosts CPU", RCOL[1]]])}
+      <div class="kcc-muted" style="margin:12px 0 4px">Datastores</div>${ds.map(([n, v]) => `<div class="kcc-row"><span style="width:150px;flex:none">${n}</span>${bar(v, v > 80 ? C.warn : C.blue, 7)}<b class="kcc-num" style="width:40px;text-align:right">${v}%</b></div>`).join("")}`;
+    return card("kcc-comp", "Compute and virtualisation", "Azure VMware Solution core and site ESXi hosts, last 24 hours · vCenter", body);
+  }
+  function estStorage() {
+    const regs = REG(), r = rnd("sto");
+    const data = regs.map((rg, i) => { const cap = 20 + Math.round(r() * 60), used = Math.round(cap * (0.45 + r() * 0.4)); return { rg, cap, used, col: RCOL[i % RCOL.length] }; });
+    const tot = data.reduce((a, d) => a + d.cap, 0), used = data.reduce((a, d) => a + d.used, 0);
+    const grow = Array.from({ length: 13 }, (_, i) => used * (0.86 + i * 0.012) + r() * 2);
+    const body = `<div class="kcc-kpis"><div class="kcc-kpi"><b>${used} / ${tot} TB</b><span>used across sites and AVS</span></div><div class="kcc-kpi"><b>+${(((grow[12] - grow[0]) / grow[0]) * 100).toFixed(1)}%</b><span>growth, 90 days</span></div></div>
+      ${data.map((d) => `<div class="kcc-row"><span style="width:150px;flex:none">${esc(d.rg)}</span><div class="kcc-bar" style="height:12px"><i style="width:${(d.used / d.cap) * 100}%;background:${d.col}"></i></div><span class="kcc-num" style="width:86px;text-align:right">${d.used} / ${d.cap} TB</span></div>`).join("")}
+      <div class="kcc-muted" style="margin:12px 0 4px">Used capacity, last 90 days</div>${lineChart([{ n: "Used TB", c: C.mag, v: grow, fill: 1 }], { h: 70, min: Math.floor(grow[0] * 0.95), fmt: (v) => Math.round(v) + " TB", ticks: [[0, "90 days ago"], [12, "today"]] })}`;
+    return card("kcc-sto", "Storage capacity", "NAS, site datastores and AVS vSAN", body);
+  }
+  function estEndpoints() {
+    const r = rnd("ep"), bins = [["<50", 2], ["50–60", 4], ["60–70", 9], ["70–80", 22], ["80–90", 41], ["90+", 22]].map(([l, v]) => [l, Math.round(v * (0.9 + r() * 0.2))]), max = Math.max(...bins.map((b) => b[1]));
+    const os = [["Windows 11 24H2", 61, RCOL[0]], ["Windows 11 23H2", 27, RCOL[1]], ["Windows 10 22H2", 9, RCOL[2]], ["macOS", 3, RCOL[3]]];
+    const age = [["< 2 years", 38], ["2–3 years", 34], ["3–4 years", 19], ["4+ years", 9]];
+    const body = `<div class="kcc-muted" style="margin-bottom:4px">Experience score (DEX), % of devices</div><div style="display:flex;gap:6px;align-items:flex-end;height:90px">${bins.map(([l, v], i) => `<div style="flex:1;text-align:center"><div class="kcc-num" style="font-size:11px">${v}%</div><div style="height:${(v / max) * 60}px;background:${i < 2 ? C.bad : i < 3 ? C.warn : C.ok};border-radius:4px 4px 0 0;opacity:.85"></div><div class="kcc-muted" style="font-size:11px">${l}</div></div>`).join("")}</div>
+      <div style="display:flex;gap:14px;align-items:center;margin-top:14px">${donut(os.map(([n, v, c]) => [n, v, c]), 120, "OS", "builds")}<div style="flex:1">${os.map(([n, v, c]) => `<div class="kcc-row"><i style="width:10px;height:10px;border-radius:3px;background:${c};flex:none"></i><span style="flex:1">${n}</span><b class="kcc-num">${v}%</b></div>`).join("")}</div></div>
+      <div class="kcc-muted" style="margin:10px 0 4px">Device age</div><div style="display:flex;height:16px;border-radius:5px;overflow:hidden">${age.map(([l, v], i) => `<i title="${l}: ${v}%" style="width:${v}%;background:${[C.ok, C.blue, C.warn, C.bad][i]}"></i>`).join("")}</div>${legend(age.map(([l, v], i) => [l, [C.ok, C.blue, C.warn, C.bad][i], v + "%"]))}`;
+    return card("kcc-ep", "PCs and laptops", "Endpoint Analytics and Intune", body);
+  }
+  function estAvail() {
+    const cl = S().clinics, days = 30, now = S().now;
+    const cell = (c, d) => { if (d === days - 1) return c.status === "down" ? [C.bad, "down now"] : c.status === "degraded" ? [C.warn, "degraded now"] : c.status === "maintenance" ? [C.maint, "maintenance"] : [C.ok + "88", "100%"]; const r = rnd("av" + c.id + d)(); return r < 0.012 ? [C.bad, (97 + r * 100).toFixed(2) + "%"] : r < 0.04 ? [C.warn, (99.4 + r).toFixed(2) + "%"] : [C.ok + "88", "100%"]; };
+    const head = `<tr><td></td>${Array.from({ length: days }, (_, d) => `<td style="font-size:10px;color:${C.muted};text-align:center">${(d % 5 === 0 || d === days - 1) ? new Date(now - (days - 1 - d) * 864e5).getDate() : ""}</td>`).join("")}<td></td></tr>`;
+    const rows = cl.map((c) => { const cells = Array.from({ length: days }, (_, d) => cell(c, d)); const up = 100 - cells.filter((x) => x[0] === C.bad).length * 0.12 - cells.filter((x) => x[0] === C.warn).length * 0.02; return `<tr><td class="kcc-click" style="white-space:nowrap;padding-right:8px" ${kx({ t: "site", id: c.id })}><b>${c.code}</b> <span class="kcc-muted">${esc(c.short || c.name)}</span></td>${cells.map(([col, t], d) => `<td title="${c.code} · ${new Date(now - (days - 1 - d) * 864e5).toDateString().slice(4, 10)} · ${t}" style="background:${col};height:16px;border-radius:3px"></td>`).join("")}<td class="kcc-num" style="padding-left:8px;font-weight:650">${up.toFixed(2)}%</td></tr>`; }).join("");
+    return card("kcc-avail", "Site availability, last 30 days", "Daily availability per site · red: outage, amber: degraded", `<table style="width:100%;border-collapse:separate;border-spacing:2px;font-size:12px;table-layout:fixed"><colgroup><col style="width:190px">${"<col>".repeat(days)}<col style="width:64px"></colgroup>${head}${rows}</table>${legend([["100%", C.ok + "88"], ["Degraded", C.warn], ["Outage", C.bad], ["Maintenance", C.maint]])}`);
+  }
+  function renderEstate() {
+    return `<div class="kcc-h2"><b>Estate</b><span>sites, circuits, compute, storage and endpoints</span></div>
+      <div class="kcc-grid kcc-g2">${estCarriers()}${estLatency()}</div>
+      <div class="kcc-grid kcc-g21">${estWan()}${estCompute()}</div>
+      <div class="kcc-grid kcc-g2">${estStorage()}${estEndpoints()}</div>
+      ${estAvail()}`;
+  }
+
+  // ----- Live Operations: streaming estate telemetry
+  function liveThroughput() {
+    const now = S().now, N = 60, ts = Array.from({ length: N }, (_, i) => now - (N - 1 - i) * 10000), regs = REG();
+    const series = regs.map((rg, i) => ({ n: rg, c: RCOL[i % RCOL.length], v: ts.map((t) => S().clinics.filter((c) => c.region === rg).reduce((a, c) => a + bwOf(c) * siteUtil(c, t) * (0.92 + rnd("tp" + c.id + Math.floor(t / 10000))() * 0.16), 0)) }));
+    return card("kcc-ltp", "WAN throughput by region", "Inbound, every 10 seconds, last 10 minutes", lineChart(series, { h: 170, dots: 1, fmt: (v) => Math.round(v) + "M", ticks: [[0, "-10 min"], [30, "-5 min"], [59, "now"]] }) + legend(series.map((s) => [s.n, s.c, Math.round(s.v[N - 1]) + " Mbps"])), pill("Live", C.ok));
+  }
+  function liveLatHeat() {
+    const now = S().now, M = 30, cl = S().clinics;
+    const col = (v) => v == null ? C.bad : v < 40 ? "#CFE8D7" : v < 60 ? "#9FD0AE" : v < 80 ? "#F6D49A" : v < 120 ? C.warn : C.bad;
+    const rows = cl.map((c) => `<tr><td class="kcc-click" style="white-space:nowrap;padding-right:8px;font-size:12px" ${kx({ t: "site", id: c.id })}><b>${c.code}</b></td>${Array.from({ length: M }, (_, i) => { const t = now - (M - 1 - i) * 6e4, v = siteLat(c, t); return `<td title="${c.code} · ${hm(t)} · ${v == null ? "no path" : Math.round(v) + " ms"}" style="background:${col(v)};height:14px;border-radius:2px"></td>`; }).join("")}<td class="kcc-num" style="padding-left:6px;font-size:12px">${siteLat(c, now) == null ? "down" : Math.round(siteLat(c, now))}</td></tr>`).join("");
+    return card("kcc-lheat", "Latency heatmap, every site", "Per minute, last 30 minutes · ms to hub on the active path", `<table style="width:100%;border-collapse:separate;border-spacing:2px">${rows}</table>${legend([["< 40 ms", "#CFE8D7"], ["40–60", "#9FD0AE"], ["60–80", "#F6D49A"], ["80–120", C.warn], ["> 120 or down", C.bad]])}`, pill("Live", C.ok));
+  }
+  function liveCarrierLoss() {
+    const now = S().now, by = {}; S().clinics.forEach((c) => (by[c.carrier || "Other"] = by[c.carrier || "Other"] || []).push(c));
+    const rows = Object.entries(by).map(([k, cs]) => { const series = Array.from({ length: 30 }, (_, i) => cs.reduce((a, c) => a + siteLoss(c, now - (29 - i) * 6e4), 0) / cs.length), v = series[29], col = v > 1 ? C.bad : v > 0.4 ? C.warn : C.ok; return `<div class="kcc-row"><span style="width:90px;flex:none"><b>${esc(k)}</b></span>${spark(series, col, 140, 26, Math.max(1.5, ...series))}<b class="kcc-num" style="width:56px;text-align:right;color:${col}">${v.toFixed(2)}%</b><span class="kcc-muted kcc-num" style="width:56px;text-align:right">${cs.length} sites</span></div>`; }).join("");
+    return card("kcc-lloss", "Packet loss by carrier", "Average across that carrier's sites, last 30 minutes", rows, pill("Live", C.ok));
+  }
+  function liveUsers() {
+    const now = S().now, cl = S().clinics, N = 30, ts = Array.from({ length: N }, (_, i) => now - (N - 1 - i) * 6e4);
+    const m = [["Wi-Fi clients", (t) => cl.reduce((a, c) => a + (c.status === "down" && t > now - 30 * 6e4 && (c.issue || {}).kind === "power" ? 0 : (c.users || 100) * 0.9 * busy(c, t)), 0) * (0.95 + rnd("wf" + Math.floor(t / 6e4))() * 0.1), RCOL[0]], ["GlobalProtect VPN sessions", (t) => 640 + wave("vpn", t, 0, 60, 3600e3, 0), RCOL[1]], ["Teams calls in progress", (t) => Math.max(0, wave("tc", t, 180, 40, 1800e3, 0.2)), RCOL[2]], ["File Services sessions (RDS)", (t) => wave("rds", t, 1150, 90, 3600e3, 0.04), RCOL[4]]];
+    return card("kcc-lusers", "People on the estate now", "Connected sessions, last 30 minutes", m.map(([n, f, col]) => { const v = ts.map(f); return `<div class="kcc-row"><span style="flex:1">${n}</span>${spark(v, col, 130, 28)}<b class="kcc-num" style="width:64px;text-align:right;font-size:16px">${Math.round(v[N - 1]).toLocaleString()}</b></div>`; }).join(""), pill("Live", C.ok));
+  }
+  function liveTopCircuits() {
+    const now = S().now, rows = S().clinics.map((c) => ({ c, u: siteUtil(c, now) })).sort((a, b) => b.u - a.u).slice(0, 10);
+    return card("kcc-ltop", "Busiest circuits now", "Primary circuit use, in and out", rows.map(({ c, u }) => { const col = u > 0.8 ? C.bad : u > 0.65 ? C.warn : C.blue; return `<div class="kcc-row kcc-click" ${kx({ t: "site", id: c.id })}><span style="width:150px;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><b>${c.code}</b> <span class="kcc-muted">${esc(c.carrier || "")} ${bwOf(c)}M</span></span>${bar(u * 100, col, 10)}<b class="kcc-num" style="width:44px;text-align:right">${Math.round(u * 100)}%</b><span class="kcc-num kcc-muted" style="width:70px;text-align:right">${(u * bwOf(c)).toFixed(1)} Mbps</span></div>`; }).join(""), pill("Live", C.ok));
+  }
+  function liveCompute() {
+    const now = S().now, vms = S().clinics.filter((c) => c.status !== "maintenance").map((c) => ({ id: `vm-${c.id}-app`, c, v: (c.issue && c.issue.kind === "esxi") ? null : Math.min(99, wave("vmc" + c.id, now, 20 + 40 * busy(c, now), 12, 900e3, 0.15)) })).sort((a, b) => (b.v == null ? 999 : b.v) - (a.v == null ? 999 : a.v)).slice(0, 8);
+    const g = (v, l) => { const a = Math.PI * (1 - v / 100), x = 60 + 46 * Math.cos(a), y = 58 - 46 * Math.sin(a), col = v > 85 ? C.bad : v > 70 ? C.warn : C.ok; return `<div style="flex:1;text-align:center"><svg viewBox="0 0 120 70" style="width:100%;max-width:140px"><path d="M14 58 A46 46 0 0 1 106 58" fill="none" stroke="#EFEAEE" stroke-width="9" stroke-linecap="round"/><path d="M14 58 A46 46 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round"/><text x="60" y="56" font-size="17" font-weight="700" text-anchor="middle" fill="${C.ink}">${Math.round(v)}%</text></svg><div class="kcc-muted" style="font-size:12px;margin-top:-4px">${l}</div></div>`; };
+    const body = `<div style="display:flex;gap:6px">${g(wave("avs-cpu", now, 46, 12, 86400e3, 0.06), "AVS CPU")}${g(wave("avs-mem", now, 68, 4, 86400e3, 0.02), "AVS memory")}${g(71, "vSAN used")}</div><div class="kcc-muted" style="margin:10px 0 4px">Busiest site VMs, CPU now</div>${vms.map(({ id, c, v }) => `<div class="kcc-row kcc-click" ${kx({ t: "device", id })}><span class="kcc-num" style="width:120px;flex:none"><b style="font-size:12px">${id}</b></span>${bar(v == null ? 100 : v, v == null ? C.bad : v > 85 ? C.bad : v > 70 ? C.warn : C.blue, 8)}<b class="kcc-num" style="width:48px;text-align:right">${v == null ? "down" : Math.round(v) + "%"}</b></div>`).join("")}`;
+    return card("kcc-lcomp", "Compute now", "vCenter, refreshed every 20 seconds", body, pill("Live", C.ok));
+  }
+  function renderLive() {
+    return `<div class="kcc-h2"><b>Live estate telemetry</b><span>network, people, compute, streaming from the estate</span></div>
+      <div class="kcc-grid kcc-g21">${liveThroughput()}${liveUsers()}</div>
+      <div class="kcc-grid kcc-g21">${liveLatHeat()}<div style="display:flex;flex-direction:column;gap:16px;min-width:0">${liveTopCircuits()}${liveCarrierLoss()}</div></div>
+      <div class="kcc-grid kcc-g2">${liveCompute()}${estLatency()}</div>`;
+  }
+
   // ---------- mount: find the page's section column and place our blocks
   const sectionOf = (el) => { let e = el; while (e && e.parentElement) { const p = e.parentElement; if (p.children.length >= 4 && getComputedStyle(p).flexDirection === "column" && p.getBoundingClientRect().width > 900) return e; if (p.tagName === "MAIN") return e; e = p; } return null; };
   const findText = (sel, txt) => [...document.querySelectorAll(sel)].find((e) => e.textContent.trim() === txt);
@@ -31935,6 +32071,11 @@ const KCC = (() => {
         if (!root) { const h = findText("main h2, main h3, main div, main span", "Service levels and error budgets"); const sec = h && sectionOf(h); if (!sec) return; root = document.createElement("div"); root.id = "kcc-cc"; root.className = "kcc-wrap"; sec.after(root); last.k = ""; }
         const key = "cc" + Math.floor(s.now / 15000) + s.clinics.map((c) => c.status[0]).join("");
         if (key !== last.k) { renderCC(root); last.k = key; }
+      } else if (page === "live") {
+        let root = document.getElementById("kcc-live");
+        if (!root) { const h = findText("main h2, main h3, main div, main span", "Tower timeline"); const sec = h && sectionOf(h); if (!sec) return; root = document.createElement("div"); root.id = "kcc-live"; root.className = "kcc-wrap"; sec.after(root); last.k = ""; }
+        const key = "lv" + Math.floor(s.now / 3000) + s.clinics.map((c) => c.status[0]).join("");
+        if (key !== last.k) { root.innerHTML = renderLive(); last.k = key; }
       } else if (page === "clinic360") {
         const c = siteOnPage(); if (!c) return;
         let top = document.getElementById("kcc-s1"), more = document.getElementById("kcc-s2");
