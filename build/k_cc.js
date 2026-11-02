@@ -39,6 +39,9 @@ const KCC = (() => {
 .kcc-chip{display:inline-block;background:${C.soft};border-radius:6px;padding:2px 7px;margin:2px 4px 2px 0;font-size:11.5px}
 .kcc-fp{width:100%;height:auto;display:block}
 .kcc-fp .dev{cursor:pointer}.kcc-fp .dev:hover circle,.kcc-fp .dev:hover rect{stroke:${C.mag};stroke-width:2.5}
+.kcc-btn{border:1px solid ${C.mag};color:${C.mag};background:#fff;border-radius:8px;padding:4px 10px;font:600 12px/1.2 inherit;cursor:pointer;white-space:nowrap}.kcc-btn:hover{background:${C.mag};color:#fff}
+.kcc-dt{width:100%;border-collapse:collapse;font-size:12.5px}.kcc-dt th{position:sticky;top:0;background:#fff;text-align:left;font-weight:600;color:${C.muted};padding:6px 8px;border-bottom:1px solid ${C.line};white-space:nowrap}.kcc-dt td{padding:6px 8px;border-bottom:1px solid #F2EEF1;white-space:nowrap;vertical-align:middle}
+.kcc-pred{border:1px solid ${C.line};border-radius:10px;padding:10px 12px;margin-bottom:8px}
 @media (max-width:1200px){.kcc-g3{grid-template-columns:repeat(2,minmax(0,1fr))}.kcc-g21{grid-template-columns:1fr}}
 `;
 
@@ -147,7 +150,8 @@ const KCC = (() => {
       <div class="kcc-grid kcc-g3">${funnel()}${mttx()}${agents()}</div>
       ${matrix()}
       <div class="kcc-grid kcc-g21">${changes()}${sla()}</div>
-      <div class="kcc-grid kcc-g3">${capacity()}${hygiene()}${shift()}</div>`;
+      <div class="kcc-grid kcc-g3">${capacity()}${hygiene()}${shift()}</div>
+      ${renderCCPP()}`;
   }
 
   // ================= SITE 360 =================
@@ -267,14 +271,178 @@ const KCC = (() => {
     const body = rows.map(([a, b, d]) => `<div class="kcc-row"><span style="width:160px;flex:none" class="kcc-muted">${a}</span><span style="flex:1;min-width:0"><b>${esc(b)}</b><br><span class="kcc-muted" style="font-size:12px">${esc(d)}</span></span></div>`).join("") + `<div class="kcc-row"><span style="width:160px;flex:none" class="kcc-muted">Circuit contract</span><b>renews ${["Mar", "Jun", "Sep", "Dec"][Math.floor(r() * 4)]} 2027</b><span class="kcc-muted">SLA credits this year: ${Math.floor(r() * 3)}</span></div>`;
     return card("kcc-ct", "Contacts and contracts", "Who to call, and what we pay for", body);
   }
-  function renderSiteTop(root, c) { root.innerHTML = timeline(c); }
+  function renderSiteTop(root, c) { root.innerHTML = timeline(c) + renderSitePP(c); }
   function renderSiteMore(root, c) {
-    root.innerHTML = `<div class="kcc-h2"><b>Site deep dive</b><span>${esc(c.label)} · floor, Wi-Fi, WAN, protection, power and lifecycle</span></div>
+    root.innerHTML = `<div class="kcc-h2"><b>Floor, Wi-Fi, WAN and site operations</b><span>${esc(c.label)}</span></div>
       <div class="kcc-grid kcc-g21">${floorplan(c)}${wifi(c)}</div>
       <div class="kcc-grid kcc-g2">${wan(c)}${siteChanges(c)}</div>
       <div class="kcc-grid kcc-g3">${protection(c)}${power(c)}${lifecycle(c)}</div>
       ${contacts(c)}`;
   }
+
+  // ================= DEVICE HEALTH, PREDICT AND PREVENT (shared by Site 360 and Command Center) =================
+  const scheduled = {}; // device id -> change number raised from the hub
+  const toast = (title, text, kind = "good") => { try { lt({ kind, title, text, nav: null }); } catch (e) {} };
+  const DT = { edge: "SD-WAN edge", sw: "Switch", ap: "Access point", srv: "Server (ESXi host)", ilo: "Server management", vm: "Site VM", nas: "NAS", ups: "UPS", prn: "Printer" };
+  const devCache = {};
+  function devices(c) {
+    const key = c.id + c.status + (c.issue ? c.issue.kind : ""), now = S().now;
+    if (devCache[key] && devCache[key].t > now - 15000) return devCache[key].d;
+    const r = rnd("dev" + c.id), k = c.issue && c.issue.kind, down = c.status === "down", maint = c.status === "maintenance", plant = /Plant/.test(c.kind);
+    const v = (b, s) => Math.round(b + r() * s);
+    const list = [
+      { id: `edge-${c.id}-01`, t: "edge", model: c.carrier === "Jio" || c.carrier === "Airtel" ? "VeloCloud Edge 620" : "VeloCloud Edge 520", cpu: v(18, 30), mem: v(35, 25), temp: v(41, 12), fw: "5.2.2", fwL: "5.2.3" },
+      { id: `sw-${c.id}-01`, t: "sw", model: `${c.switchVendor || "Cisco"} Catalyst 9200-48P`, cpu: v(8, 20), mem: v(30, 20), temp: v(38, 10), fw: "17.9.4", fwL: "17.9.5" },
+      { id: `sw-${c.id}-02`, t: "sw", model: `${c.switchVendor || "Cisco"} Catalyst 2960-X`, cpu: v(10, 25), mem: v(40, 25), temp: v(40, 12), fw: "15.2(7)E8", fwL: "15.2(7)E10", eos: true },
+      { id: `srv-${c.id}`, t: "srv", model: "HPE ProLiant DL380 Gen10", cpu: v(20, 40), mem: v(45, 30), temp: v(22, 6), fw: "U30 2.90", fwL: "U30 3.10" },
+      { id: `ilo-${c.id}`, t: "ilo", model: "HPE iLO 5", cpu: v(3, 6), mem: v(20, 10), temp: v(24, 5), fw: "3.05", fwL: "3.08" },
+      { id: `vm-${c.id}-app`, t: "vm", model: "Windows Server 2022 VM", cpu: v(15, 45), mem: v(40, 35), disk: v(35, 40), fw: "Tools 12.4", fwL: "Tools 12.4" },
+      { id: `nas-${c.id}`, t: "nas", model: "NAS 8 TB · RAID 6", cpu: v(5, 20), mem: v(30, 20), disk: v(45, 35), temp: v(33, 8), fw: "5.1.8", fwL: "5.2.0" },
+      { id: `ups-${c.id}`, t: "ups", model: "APC Smart-UPS 6 kVA", load: v(30, 35), temp: v(25, 6), batt: +(1.2 + r() * 3.4).toFixed(1), fw: "UPS 15.3", fwL: "UPS 15.5" },
+      ...Array.from({ length: plant ? 8 : 6 }, (_, i) => ({ id: `ap-${c.id}-0${i + 1}`, t: "ap", model: "Wi-Fi 6 access point", cpu: v(10, 30), mem: v(30, 30), temp: v(45, 10), retries: v(3, 9), fw: "17.9.4", fwL: "17.9.5" })),
+      { id: `prn-${c.id}-01`, t: "prn", model: "HP LaserJet Enterprise M611", toner: v(8, 80), jams: v(0, 4), fw: "5.7", fwL: "5.7" },
+    ];
+    list.forEach((d) => {
+      if (r() > 0.3) d.fwL = d.fw; d.up = maint ? 0 : v(6, 120); d.alerts = 0; d.risk = r() * 0.12; d.health = v(86, 13); d.state = "ok"; d.trend = Array.from({ length: 14 }, () => 0.1 + r() * 0.15); d.sig = ""; d.act = ""; d.eta = 0;
+      // baseline wear signals that a site normally has
+      if (d.t === "ups" && d.batt > 3.6) Object.assign(d, { risk: 0.3 + (d.batt - 3.6) * 0.3, sig: `Battery ${d.batt} years old; runtime test fell from 41 to ${v(24, 8)} min`, act: "Replace battery set in the maintenance window", eta: v(20, 40) });
+      if (d.t === "nas" && d.disk > 70) Object.assign(d, { risk: 0.3 + (d.disk - 70) / 60, sig: `Volume ${d.disk}% used, growing ${(0.3 + r() * 0.6).toFixed(1)}% a day`, act: "Archive data older than 90 days or add a disk shelf", eta: Math.max(4, Math.round((95 - d.disk) / 0.6)) });
+      if (d.t === "vm" && d.disk > 66) Object.assign(d, { risk: 0.25 + (d.disk - 66) / 70, sig: `Disk ${d.disk}% used; forecast to hit 95% in ${Math.max(3, Math.round((95 - d.disk) / 1.1))} days`, act: "Extend the virtual disk (standard change)", eta: Math.max(3, Math.round((95 - d.disk) / 1.1)) });
+      if (d.t === "ap" && d.retries > 9) Object.assign(d, { risk: 0.22 + d.retries / 60, sig: `Retry rate ${d.retries}% and rising; co-channel interference`, act: "Re-plan channels; move to 5 GHz-only SSID", eta: 14 });
+      if (d.t === "sw" && d.eos) Object.assign(d, { risk: Math.max(d.risk, 0.28), sig: "End of support; 2 open vendor advisories", act: "Replace with Catalyst 9200 (budgeted Q1)", eta: 60 });
+      if (d.t === "prn" && d.toner < 15) Object.assign(d, { risk: 0.5, sig: `Toner ${d.toner}%; ${Math.max(1, Math.round(d.toner / 4))} days left at current use`, act: "Ship toner cartridge", eta: Math.max(1, Math.round(d.toner / 4)) });
+      if (d.t === "srv" && r() < 0.35) Object.assign(d, { risk: 0.3 + r() * 0.15, sig: `Disk 3 SMART: reallocated sectors ${v(18, 40)} (up from 2 last month)`, act: "Replace drive 3 (hot-swap, spare on site)", eta: v(10, 20) });
+      if (d.t === "edge" && r() < 0.25) Object.assign(d, { risk: 0.26, sig: "Primary link CRC errors trending up after midnight", act: "Ask carrier to check the hand-off; swap SFP", eta: 9 });
+      // live faults from the hub's own state
+      const off = () => Object.assign(d, { live: 1, state: "bad", health: 0, alerts: 2, up: 0, cpu: undefined, mem: undefined, sig: d.sig || "Not responding", risk: 1 });
+      if (k === "power" && d.t !== "ups") off();
+      if (k === "power" && d.t === "ups") Object.assign(d, { live: 1, state: plant ? "warn" : "bad", health: plant ? 61 : 25, alerts: 1, risk: 0.7, sig: plant ? "Utility lost; feeding from generator" : "On battery, utility lost", act: "Track utility restoration; recharge test after" });
+      if (k === "edge-hw" && d.t === "edge") off();
+      if (k === "carrier-down" && d.t === "edge") Object.assign(d, { live: 1, state: "bad", health: 22, alerts: 3, risk: 0.9, sig: "Primary circuit down; no backup", act: "Carrier case open" });
+      if (k === "onlte" && d.t === "edge") Object.assign(d, { live: 1, state: "warn", health: 64, alerts: 1, risk: 0.5, sig: "Running on 4G backup", act: "Return to primary when carrier clears" });
+      if (k === "jitter" && d.t === "edge") Object.assign(d, { live: 1, state: "warn", health: 58, alerts: 2, risk: 0.55, sig: "Jitter 30+ ms at shift start, 5 days running", act: "Circuit upgrade (problem record open)" });
+      if (k === "psu" && d.t === "srv") Object.assign(d, { state: "warn", health: 52, alerts: 1, risk: 0.72, sig: "PSU 2 output voltage drifting 11.6 → 11.2 V", act: "Replace PSU 2 before it fails (redundancy lost)", eta: 6 });
+      if (k === "temp" && d.t === "ilo") Object.assign(d, { state: "warn", health: 55, temp: 34, alerts: 1, risk: 0.6, sig: "Inlet 34 °C; fan 3 at 92%", act: "Check room cooling; clean filters" });
+      if (k === "esxi" && (d.t === "srv" || d.t === "vm")) off();
+      if (k === "vmdisk" && d.t === "vm") Object.assign(d, { state: "warn", health: 48, disk: 93, alerts: 1, risk: 0.8, sig: "Disk 93% used; full in about 2 days", act: "Extend disk (CHG awaiting approval)", eta: 2 });
+      if ((k === "qnap" || k === "drive") && d.t === "nas") Object.assign(d, { state: "warn", health: 50, alerts: 1, risk: 0.75, sig: "Disk 4 degraded; RAID rebuilding", act: "Replace disk 4", eta: 3 });
+      if (k === "switch" && d.id.endsWith("-01") && d.t === "sw") Object.assign(d, { live: 1, state: "warn", health: 54, alerts: 2, risk: 0.65, sig: "Uplink CRC errors 1,240/min; port flaps", act: "Replace uplink optic; check cabling" });
+      if (k === "spooler" && d.t === "prn") Object.assign(d, { live: 1, state: "warn", health: 55, alerts: 1, risk: 0.5, sig: "Queue stalled 3 times this week", act: "Driver update on print server" });
+      if (maint) Object.assign(d, { state: "maint" });
+      if (d.state === "ok") { d.health = Math.round(Math.min(d.health, 100 - d.risk * 55)); if (d.risk > 0.45) d.state = "warn"; }
+      d.risk = Math.min(1, d.risk);
+      if (d.risk > 0.2 && d.state !== "bad") d.trend = d.trend.map((x, i) => x + (d.risk - 0.15) * (i / 13) * (0.9 + r() * 0.2));
+      if (scheduled[d.id]) d.sched = scheduled[d.id];
+    });
+    devCache[key] = { t: now, d: list };
+    return list;
+  }
+  const hcol = (h, st) => st === "maint" ? C.maint : st === "bad" || h < 40 ? C.bad : st === "warn" || h < 70 ? C.warn : C.ok;
+  const actBtn = (d, c) => d.sched ? pill("Scheduled · " + d.sched, C.ok) : `<button class="kcc-btn" data-kcc-act="schedule" data-dev="${d.id}" data-site="${c.id}">Schedule fix</button>`;
+
+  function deviceHealth(c) {
+    const ds = devices(c).slice().sort((a, b) => (a.state === "bad" ? -1 : 0) - (b.state === "bad" ? -1 : 0) || a.health - b.health);
+    const cell = (v, warn, bad, u = "%") => v == null ? `<span class="kcc-muted">–</span>` : `<span style="color:${v >= bad ? C.bad : v >= warn ? C.warn : C.ink}">${v}${u}</span>`;
+    const rows = ds.map((d) => `<tr class="kcc-click" ${kx({ t: "device", id: d.id })}><td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${hcol(d.health, d.state)};margin-right:7px"></span><b class="kcc-num">${d.id}</b><div class="kcc-muted" style="font-size:11.5px;margin-left:15px">${DT[d.t]} · ${esc(d.model)}</div></td>
+      <td><div style="display:flex;align-items:center;gap:6px"><b class="kcc-num" style="width:26px;color:${hcol(d.health, d.state)}">${d.state === "maint" ? "–" : d.health}</b>${bar(d.health, hcol(d.health, d.state), 6)}</div></td>
+      <td class="kcc-num">${cell(d.cpu, 70, 90)}</td><td class="kcc-num">${d.mem != null ? cell(d.mem, 80, 92) : d.load != null ? cell(d.load, 70, 85) : cell(null)}</td><td class="kcc-num">${d.disk != null ? cell(d.disk, 80, 90) : d.toner != null ? cell(d.toner, 101, 101) : cell(null)}</td><td class="kcc-num">${d.temp != null ? cell(d.temp, d.t === "srv" || d.t === "ilo" ? 28 : 55, d.t === "srv" || d.t === "ilo" ? 32 : 65, "°") : cell(null)}</td>
+      <td class="kcc-num">${d.state === "bad" ? `<span style="color:${C.bad}">down</span>` : d.up + " d"}</td><td class="kcc-num" style="${d.fw !== d.fwL ? "color:" + C.warn : ""}" title="${d.fw !== d.fwL ? "Latest: " + d.fwL : "Current"}">${esc(d.fw)}${d.fw !== d.fwL ? " ↑" : ""}</td>
+      <td>${d.alerts ? pill(d.alerts + " open", d.state === "bad" ? C.bad : C.warn) : `<span class="kcc-muted">0</span>`}</td><td>${spark(d.trend, d.risk > 0.45 ? C.bad : d.risk > 0.2 ? C.warn : C.ok, 64, 20, 1)}</td></tr>`).join("");
+    const cnt = { ok: ds.filter((d) => hcol(d.health, d.state) === C.ok).length, warn: ds.filter((d) => hcol(d.health, d.state) === C.warn).length, bad: ds.filter((d) => hcol(d.health, d.state) === C.bad).length };
+    const outdated = ds.filter((d) => d.fw !== d.fwL).length;
+    const body = `<div class="kcc-kpis"><div class="kcc-kpi"><b style="color:${C.ok}">${cnt.ok}</b><span>healthy devices</span></div><div class="kcc-kpi"><b style="color:${C.warn}">${cnt.warn}</b><span>degraded or at risk</span></div><div class="kcc-kpi"><b style="color:${C.bad}">${cnt.bad}</b><span>down</span></div><div class="kcc-kpi"><b>${outdated}</b><span>behind on firmware</span></div></div>
+      <div style="max-height:430px;overflow:auto" class="scroll-thin"><table class="kcc-dt"><thead><tr><th>Device</th><th style="width:150px">Health</th><th>CPU</th><th>Mem / load</th><th>Disk / toner</th><th>Temp</th><th>Uptime</th><th>Firmware</th><th>Alerts</th><th>Risk, 14 days</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    return card("kcc-dev", "Device health", `${ds.length} monitored devices · OpsRamp, vCenter, iLO, SD-WAN, Wi-Fi controller, UPS card · click a row to drill down`, body);
+  }
+  function predictive(c) {
+    const ds = devices(c).filter((d) => d.risk >= 0.2 && d.state !== "bad" && d.act && !d.live).sort((a, b) => b.risk - a.risk).slice(0, 6);
+    const rows = ds.map((d) => { const col = d.risk > 0.6 ? C.bad : d.risk > 0.35 ? C.warn : C.yellow; return `<div class="kcc-pred"><div style="display:flex;align-items:center;gap:10px"><b class="kcc-num kcc-click" ${kx({ t: "device", id: d.id })}>${d.id}</b><span class="kcc-muted" style="font-size:12px">${DT[d.t]}</span><span style="margin-left:auto">${pill(Math.round(d.risk * 100) + "% risk" + (d.eta ? " · ~" + d.eta + " days" : ""), col)}</span></div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:6px"><div style="flex:1;min-width:0"><div style="font-size:12.5px"><span class="kcc-muted">Signal:</span> ${esc(d.sig)}</div><div style="font-size:12.5px;margin-top:2px"><span class="kcc-muted">Prevent:</span> <b>${esc(d.act)}</b></div></div>${spark(d.trend, col, 80, 26, 1)}${actBtn(d, c)}</div></div>`; }).join("");
+    return card("kcc-pred", "Predicted failures, next 30 days", "Mova iO prediction agent · trend models on device telemetry, SMART, PSU, battery and error counters", rows || `<p class="kcc-muted">No device is trending towards failure.</p>`, pill(ds.length + " at risk", ds.length ? C.warn : C.ok));
+  }
+  function preventive(c) {
+    const r = rnd("pm" + c.id), now = S().now, day = 864e5, plant = /Plant/.test(c.kind);
+    const tasks = [["UPS self-test and runtime check", 30, `ups-${c.id}`], ["UPS battery inspection", 180, `ups-${c.id}`], ["Firmware review: switches and APs", 90, `sw-${c.id}-01`], ["Server hardware health check (iLO)", 30, `srv-${c.id}`], ["Backup restore test (SureBackup)", 30, `vm-${c.id}-app`], ["Server room filter and cooling check", 90, `ilo-${c.id}`], ["Certificate expiry review", 30, `edge-${c.id}-01`], ["Wi-Fi survey and channel plan", 180, `ap-${c.id}-01`], ...(plant ? [["Generator load test", 30, "generator"]] : []), ["Printer service kit", 120, `prn-${c.id}-01`]];
+    const rows = tasks.map(([n, every, dev]) => { const since = Math.round(r() * every * 1.25); const due = every - since; const st = due < 0 ? ["Overdue " + -due + " d", C.bad] : due === 0 ? ["Due today", C.warn] : due <= 7 ? ["Due in " + due + " d", C.warn] : ["Next in " + due + " d", C.ok]; return { n, every, dev, since, due, st }; }).sort((a, b) => a.due - b.due);
+    const comp = rows.filter((x) => x.due >= 0).length / rows.length;
+    const body = `<div class="kcc-kpis"><div class="kcc-kpi"><b style="color:${comp >= 0.9 ? C.ok : C.warn}">${pct(comp)}</b><span>maintenance plan on time</span></div><div class="kcc-kpi"><b>${rows.filter((x) => x.due < 0).length}</b><span>overdue</span></div><div class="kcc-kpi"><b>${rows.filter((x) => x.due >= 0 && x.due <= 7).length}</b><span>due this week</span></div></div>
+      ${rows.map((x) => `<div class="kcc-row"><span style="flex:1;min-width:0">${esc(x.n)}<br><span class="kcc-muted" style="font-size:12px">every ${x.every} days · last done ${x.since} days ago</span></span>${pill(x.st[0], x.st[1])}${x.due <= 7 ? `<button class="kcc-btn" data-kcc-act="pm" data-task="${esc(x.n)}" data-site="${c.id}">${x.due < 0 ? "Book now" : "Book"}</button>` : `<span style="width:58px"></span>`}</div>`).join("")}`;
+    return card("kcc-pm", "Preventive maintenance plan", "Recurring tasks in ServiceNow · booked into the Sunday 02:00 window or a field visit", body);
+  }
+  function reliability(c) {
+    const r = rnd("rel" + c.id), now = S().now, n = 30, down = c.status === "down";
+    const inc90 = 2 + Math.floor(r() * 5) + (c.status !== "healthy" ? 1 : 0), mtbf = Math.round((90 * 24) / inc90), mttr = Math.round(25 + r() * 70);
+    const h = Array.from({ length: n }, (_, i) => Math.round(88 + r() * 10 - (r() < 0.06 ? 15 + r() * 15 : 0)));
+    h[n - 1] = c.health != null ? c.health : h[n - 1];
+    const W = 520, H = 110, x = (i) => (i / (n - 1)) * W, y = (v) => H - (Math.max(0, v - 40) / 60) * H;
+    const path = h.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+    const dips = h.map((v, i) => [v, i]).filter(([v]) => v < 75);
+    const svg = `<svg viewBox="0 -6 ${W} ${H + 22}" style="width:100%;height:auto;display:block"><rect x="0" y="${y(100)}" width="${W}" height="${y(70) - y(100)}" fill="${C.ok}10"/><line x1="0" x2="${W}" y1="${y(70)}" y2="${y(70)}" stroke="${C.warn}" stroke-dasharray="4 4"/><path d="${path} L${W} ${H} L0 ${H} Z" fill="${C.blue}18"/><path d="${path}" fill="none" stroke="${C.blue}" stroke-width="2"/>${dips.map(([v, i]) => `<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="${i === n - 1 && down ? C.bad : C.warn}"><title>Day ${i - n + 1}: health ${v}</title></circle>`).join("")}<text x="0" y="${H + 14}" font-size="10" fill="${C.muted}">30 days ago</text><text x="${W}" y="${H + 14}" font-size="10" fill="${C.muted}" text-anchor="end">today</text></svg>`;
+    const repeat = [["Wi-Fi drops in the training room", 3], ["Print queue stalls after patching", 2], ["Jitter at shift start", c.issue && c.issue.kind === "jitter" ? 5 : 1]].filter((x) => x[1] > 1 || r() < 0.5);
+    const prevented = [["Disk extended before it filled", "vm"], ["Battery swapped after a failed runtime test", "ups"], ["Drive replaced on SMART warning", "srv"], ["Optic swapped on rising CRC errors", "sw"]].filter(() => r() < 0.65);
+    const body = `<div class="kcc-kpis"><div class="kcc-kpi"><b>${inc90}</b><span>incidents, 90 days</span></div><div class="kcc-kpi"><b>${mtbf} h</b><span>mean time between failures</span></div><div class="kcc-kpi"><b>${mttr} min</b><span>mean time to restore</span></div><div class="kcc-kpi"><b style="color:${C.ok}">${prevented.length}</b><span>incidents prevented this quarter</span></div></div>
+      <div class="kcc-muted" style="margin-bottom:4px">Site health score, last 30 days</div>${svg}
+      <div class="kcc-grid kcc-g2" style="margin-top:10px;gap:14px"><div><div class="kcc-muted" style="margin-bottom:4px">Repeat issues (90 days)</div>${repeat.map(([t, n]) => `<div class="kcc-row"><span style="flex:1">${t}</span>${pill(n + "×", n > 2 ? C.warn : C.maint)}</div>`).join("") || `<p class="kcc-muted">None.</p>`}</div>
+      <div><div class="kcc-muted" style="margin-bottom:4px">Prevented before users noticed</div>${prevented.map(([t]) => `<div class="kcc-row"><span style="color:${C.ok}">✓</span><span style="flex:1">${t}</span></div>`).join("") || `<p class="kcc-muted">Nothing this quarter.</p>`}</div></div>`;
+    return card("kcc-rel", "Site reliability", "Health trend, failure rate and what was caught early", body);
+  }
+  function anomaly(c) {
+    const r = rnd("an" + c.id), n = 7 * 24, base = 38 + r() * 8, k = c.issue && c.issue.kind;
+    const vals = Array.from({ length: n }, (_, i) => { const hr = i % 24, busy = hr >= 9 && hr <= 18; return base + (busy ? 6 : 0) + (r() - 0.5) * 6; });
+    const anom = [Math.floor(n * 0.42), Math.floor(n * 0.78)]; anom.forEach((i) => (vals[i] = base + 38 + r() * 20));
+    if (["jitter", "onlte", "carrier-down", "edge-hw"].includes(k)) for (let i = n - 4; i < n; i++) vals[i] = base + 60 + r() * 40;
+    const W = 560, H = 150, max = Math.max(...vals) * 1.05, x = (i) => (i / (n - 1)) * W, y = (v) => H - (v / max) * H;
+    const band = vals.map((_, i) => { const hr = i % 24, busy = hr >= 9 && hr <= 18; return [base + (busy ? 6 : 0) - 6, base + (busy ? 6 : 0) + 7]; });
+    const bandPath = band.map(([lo, hi], i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(hi).toFixed(1)}`).join(" ") + " " + band.slice().reverse().map(([lo], j) => `L${x(n - 1 - j).toFixed(1)} ${y(lo).toFixed(1)}`).join(" ") + " Z";
+    const line = vals.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+    const outs = vals.map((v, i) => [v, i]).filter(([v, i]) => v > band[i][1] + 8);
+    const svg = `<svg viewBox="0 0 ${W} ${H + 16}" style="width:100%;height:auto;display:block"><path d="${bandPath}" fill="${C.ok}22"/><path d="${line}" fill="none" stroke="${C.blue}" stroke-width="1.4"/>${outs.map(([v, i]) => `<circle cx="${x(i)}" cy="${y(v)}" r="4.5" fill="${i > n - 6 ? C.bad : C.warn}"><title>${Math.round(v)} ms · outside the learned band</title></circle>`).join("")}${[0, 1, 2, 3, 4, 5, 6].map((d) => `<text x="${x(d * 24) + 4}" y="${H + 13}" font-size="10" fill="${C.muted}">${["Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon"][d]}</text>`).join("")}</svg>`;
+    const body = `${svg}<div class="kcc-legend" style="margin-top:8px"><span><i style="background:${C.ok}55"></i>Learned normal band (time-of-day aware)</span><span><i style="background:${C.warn};border-radius:50%"></i>Anomaly, explained</span><span><i style="background:${C.bad};border-radius:50%"></i>Anomaly, active</span><span style="margin-left:auto">${outs.length} anomalies in 7 days · ${outs.filter(([, i]) => i > n - 6).length ? "1 active" : "none active"}</span></div>`;
+    return card("kcc-anom", "Latency to hub vs learned baseline", "Anomaly detection on the SD-WAN path, last 7 days, hourly", body);
+  }
+  function renderSitePP(c) {
+    return `<div class="kcc-h2"><b>Health, prediction and prevention</b><span>every device, what is likely to fail next, and the plan to stop it</span></div>
+      ${deviceHealth(c)}
+      <div class="kcc-grid kcc-g2">${predictive(c)}${preventive(c)}</div>
+      <div class="kcc-grid kcc-g21">${reliability(c)}${anomaly(c)}</div>`;
+  }
+
+  // ---------- Command Center: fleet view of the same
+  function fleetHealth() {
+    const types = ["edge", "sw", "ap", "srv", "vm", "nas", "ups", "prn"], agg = {};
+    types.forEach((t) => (agg[t] = { ok: 0, warn: 0, bad: 0, maint: 0 }));
+    S().clinics.forEach((c) => devices(c).forEach((d) => { if (!agg[d.t]) return; const col = hcol(d.health, d.state); agg[d.t][col === C.ok ? "ok" : col === C.warn ? "warn" : col === C.bad ? "bad" : "maint"]++; }));
+    const rows = types.map((t) => { const a = agg[t], tot = a.ok + a.warn + a.bad + a.maint; return `<div class="kcc-row"><span style="width:118px;flex:none">${{ edge: "SD-WAN edges", sw: "Switches", ap: "Access points", srv: "ESXi hosts", vm: "Site VMs", nas: "NAS", ups: "UPS", prn: "Printers" }[t]}</span><div style="flex:1;display:flex;height:14px;border-radius:5px;overflow:hidden">${["ok", "warn", "bad", "maint"].map((s) => a[s] ? `<i title="${a[s]} ${s}" style="width:${(a[s] / tot) * 100}%;background:${{ ok: C.ok, warn: C.warn, bad: C.bad, maint: C.maint }[s]}${s === "ok" ? "AA" : ""}"></i>` : "").join("")}</div><b class="kcc-num" style="width:34px;text-align:right">${tot}</b><span class="kcc-num" style="width:58px;text-align:right;color:${a.warn + a.bad ? C.warn : C.muted}">${a.warn + a.bad} at risk</span></div>`; }).join("");
+    return card("kcc-fleet", "Fleet device health", "Every monitored device across all sites, by type", rows + `<div class="kcc-legend" style="margin-top:10px"><span><i style="background:${C.ok}AA"></i>Healthy</span><span><i style="background:${C.warn}"></i>Degraded or at risk</span><span><i style="background:${C.bad}"></i>Down</span><span><i style="background:${C.maint}"></i>Maintenance</span></div>`);
+  }
+  function fleetPredict() {
+    const all = []; S().clinics.forEach((c) => devices(c).forEach((d) => { if (d.risk >= 0.3 && d.state !== "bad" && d.state !== "maint" && d.act && !d.live) all.push({ c, d }); }));
+    all.sort((a, b) => b.d.risk - a.d.risk);
+    const cap = {}, top = all.filter(({ d }) => (cap[d.t] = (cap[d.t] || 0) + 1) <= 2).slice(0, 8);
+    const rows = top.map(({ c, d }) => { const col = d.risk > 0.6 ? C.bad : C.warn; return `<div class="kcc-row"><span style="width:44px;flex:none" class="kcc-click" ${kx({ t: "site", id: c.id })}><b>${c.code}</b></span><span style="flex:1;min-width:0"><b class="kcc-num kcc-click" style="font-size:12px" ${kx({ t: "device", id: d.id })}>${d.id}</b> <span class="kcc-muted" style="font-size:12px">${esc(d.sig)}</span><br><span style="font-size:12px">→ ${esc(d.act)}</span></span>${pill(Math.round(d.risk * 100) + "%" + (d.eta ? " · " + d.eta + " d" : ""), col)}${actBtn(d, c)}</div>`; }).join("");
+    return card("kcc-fpred", "Predicted failures, all sites", `${all.length} devices trending towards failure in the next 30 days · top risks, at most two per device type`, rows);
+  }
+  function fleetPrevent() {
+    const r = rnd("fprev"), regions = [...new Set(S().clinics.map((c) => c.region))];
+    const rows = regions.map((rg) => { const v = 0.82 + r() * 0.17; return `<div class="kcc-row"><span style="width:150px;flex:none">${esc(rg)}</span>${bar(v * 100, v >= 0.9 ? C.ok : C.warn, 7)}<b class="kcc-num" style="width:44px;text-align:right">${pct(v)}</b></div>`; }).join("");
+    const prevented = [["hyd-city-fs-02", "Disk extended 5 days before full", "Fri"], ["ups-0389", "Battery set replaced after runtime test", "Thu"], ["srv-0912", "Drive 3 replaced on SMART warning", "Wed"], ["edge-0745-01", "SFP swapped on rising CRC errors", "Tue"], ["Repo-HQ-02", "Retention cut to stop repository filling", "Mon"]];
+    const body = `<div class="kcc-kpis"><div class="kcc-kpi"><b style="color:${C.ok}">14</b><span>incidents prevented this month</span></div><div class="kcc-kpi"><b>31 h</b><span>outage time avoided (estimate)</span></div><div class="kcc-kpi"><b>92%</b><span>maintenance plan on time</span></div></div>
+      <div class="kcc-muted" style="margin-bottom:4px">Preventive maintenance on time, by region</div>${rows}
+      <div class="kcc-muted" style="margin:12px 0 4px">Recently prevented</div>${prevented.map(([d, t, w]) => `<div class="kcc-row"><span style="color:${C.ok}">✓</span><b class="kcc-num" style="font-size:12px;width:112px;flex:none">${d}</b><span style="flex:1">${t}</span><span class="kcc-muted">${w}</span></div>`).join("")}`;
+    return card("kcc-fprev", "Prevention", "Caught early, fixed in a window, before users noticed", body);
+  }
+  function renderCCPP() {
+    return `<div class="kcc-h2"><b>Predict and prevent</b><span>device health across the estate, what is likely to fail, and what was stopped early</span></div>
+      <div class="kcc-grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) minmax(0,1fr)">${fleetHealth()}${fleetPredict()}${fleetPrevent()}</div>`;
+  }
+  // buttons: schedule a preventive fix or book a maintenance task
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-kcc-act]"); if (!b) return; e.preventDefault(); e.stopPropagation();
+    const site = S().clinics.find((c) => c.id === b.dataset.site);
+    if (b.dataset.kccAct === "schedule") { const n = "CHG00" + (31900 + Math.floor(Math.random() * 90)); scheduled[b.dataset.dev] = n; Object.keys(devCache).forEach((k) => delete devCache[k]); toast("Preventive change raised", `${n} for ${b.dataset.dev}${site ? " at " + site.label : ""}, booked into the Sunday 02:00 window.`); }
+    else { toast("Maintenance booked", `${b.dataset.task}${site ? " · " + site.label : ""} · Sunday 02:00 window, field engineer notified.`); b.outerHTML = pill("Booked", C.ok); }
+    last.k = ""; tick();
+  }, true);
 
   // ---------- mount: find the page's section column and place our blocks
   const sectionOf = (el) => { let e = el; while (e && e.parentElement) { const p = e.parentElement; if (p.children.length >= 4 && getComputedStyle(p).flexDirection === "column" && p.getBoundingClientRect().width > 900) return e; if (p.tagName === "MAIN") return e; e = p; } return null; };
@@ -286,14 +454,14 @@ const KCC = (() => {
       if (page === "command") {
         let root = document.getElementById("kcc-cc");
         if (!root) { const h = findText("main h2, main h3, main div, main span", "Service levels and error budgets"); const sec = h && sectionOf(h); if (!sec) return; root = document.createElement("div"); root.id = "kcc-cc"; root.className = "kcc-wrap"; sec.after(root); last.k = ""; }
-        const key = "cc" + Math.floor(s.now / 4000) + s.clinics.map((c) => c.status[0]).join("");
+        const key = "cc" + Math.floor(s.now / 15000) + s.clinics.map((c) => c.status[0]).join("");
         if (key !== last.k) { renderCC(root); last.k = key; }
       } else if (page === "clinic360") {
         const c = siteOnPage(); if (!c) return;
         let top = document.getElementById("kcc-s1"), more = document.getElementById("kcc-s2");
         if (!top || top.dataset.site !== c.id) { top && top.remove(); const h = findText("main h2, main h3, main div, main span", "Site metrics"); const sec = h && sectionOf(h); if (!sec) return; top = document.createElement("div"); top.id = "kcc-s1"; top.className = "kcc-wrap"; top.dataset.site = c.id; sec.after(top); last.k = ""; }
         if (!more || more.dataset.site !== c.id) { more && more.remove(); const h = findText("main h2, main h3, main div, main span", "Dependencies"); const sec = h && sectionOf(h); if (!sec) return; more = document.createElement("div"); more.id = "kcc-s2"; more.className = "kcc-wrap"; more.dataset.site = c.id; (sec.parentElement && sec.parentElement.children.length < 4 ? sec.parentElement : sec).after(more); last.k = ""; }
-        const key = "s" + c.id + Math.floor(s.now / 5000) + c.status;
+        const key = "s" + c.id + Math.floor(s.now / 20000) + c.status;
         if (key !== last.k) { renderSiteTop(top, c); renderSiteMore(more, c); last.k = key; }
       }
     } catch (e) { console.warn("kcc", e); }
