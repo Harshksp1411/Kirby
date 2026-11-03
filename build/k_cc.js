@@ -611,3 +611,5 @@ const KCC = (() => {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else setTimeout(start, 0);
   return { tick };
 })();
+// voice-call scripts, exposed for the clip generator and the presenter tools
+try { window.__KX_V = { bd, zKe }; } catch (e) {}

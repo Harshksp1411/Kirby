@@ -196,6 +196,10 @@ rep_exact('kpi: "Approvals per minute", unit: ""', 'kpi: "Latency to Microsoft 3
 rep_exact('Stethoscope: t_', 'Stethoscope: Pz')
 
 # drill-down from anywhere
+# voice-call audio: clips live in ../voice-clips.js (Kokoro), keyed like zKe; use their real durations
+rep_exact('aD = {}, zKe = {', 'aD = (window.__KX_VOICE = window.__KX_VOICE || {}), zKe = {')
+rep_exact('const n = e11.d * 1e3;', 'const n = ((window.__KX_VOICE_D || {})[e11.k] || e11.d) * 1e3;')
+rep_exact('hn(Be, Re, T, Yt.d)', 'hn(Be, Re, T, (window.__KX_VOICE_D || {})[Yt.k] || Yt.d)', 2)
 s += '\n' + rd('k_drill.js') + '\n'
 s += '\n' + rd('k_cc.js') + '\n'
 
